@@ -1,49 +1,18 @@
 import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "react-toastify";
-import { post } from "../../lib/api";
-import FormField from "../FormField";
-import PrimaryButton from "../PrimaryButton";
-import CareerSelect from "../CareerSelect";
-import TopicSelect from "../TopicSelect";
-import useAuthStore from "../../store/useAuthStore";
-import { validateEmail } from "../../utils/validation";
-import type { UserInfo } from "../../types/UserInfo";
+import { post } from "../../../lib/api";
+import FormField from "../../../components/ui/FormField";
+import PrimaryButton from "../../../components/ui/PrimaryButton";
+import CareerSelect from "../../../components/CareerSelect";
+import TopicSelect from "../../../components/TopicSelect";
+import useAuthStore from "../../../stores/useAuthStore";
+import { validateEmail } from "../../../utils/validation";
+import type { UserInfo } from "../../../types/UserInfo";
+import type { FormProps, MentorSignupPayload, SignupResponse } from "../../../types/auth";
+import { COMMON_STYLES } from "../../../constants/styles";
 
-interface Props {
-  onCancel: () => void;
-  onSubmit: () => void; // 후속 네비게이션 등
-}
-
-interface MentorSignupPayload {
-  email: string;
-  password: string;
-  nickname: string;
-  age: number;
-  role: "MENTOR";
-  mentor: {
-    jobTitle: string;
-    major: string;
-    intro: string;
-    tags: string;
-    orgName: string;
-    verificationUrl: string;
-  };
-}
-
-interface SignupResponse {
-  id: number;
-  accessToken: string;
-  age: number;
-  message: string;
-  nickname: string;
-  email: string;
-  role: "STUDENT" | "MENTOR";
-}
-
-type SignupRes = SignupResponse;
-
-const MentoJoinForm = ({ onCancel, onSubmit }: Props) => {
+const MentoJoinForm = ({ onCancel, onSubmit }: FormProps) => {
   const [userId, setUserId] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
@@ -57,7 +26,7 @@ const MentoJoinForm = ({ onCancel, onSubmit }: Props) => {
 
   const signupMutation = useMutation({
     mutationFn: (payload: MentorSignupPayload) =>
-      post<SignupRes>("/auth/signup", payload),
+      post<SignupResponse>("/auth/signup", payload),
     onSuccess: async (res) => {
       try {
         if (res.success) {
@@ -119,8 +88,8 @@ const MentoJoinForm = ({ onCancel, onSubmit }: Props) => {
     signupMutation.isPending;
 
   return (
-    <div className="bg-[#F9F9F9] rounded-lg p-6 mb-6 shadow-lg w-full">
-      <h2 className="text-xl font-semibold mb-4">멘토 정보 입력</h2>
+    <div className={COMMON_STYLES.FORM_CONTAINER}>
+      <h2 className={`text-xl font-semibold mb-4 ${COMMON_STYLES.TEXT_PRIMARY}`}>멘토 정보 입력</h2>
       <form onSubmit={handleSubmit} className="w-full flex flex-col gap-4">
         <FormField
           label="이메일"
@@ -142,7 +111,7 @@ const MentoJoinForm = ({ onCancel, onSubmit }: Props) => {
           autoComplete="new-password"
           required
         />
-        <hr className="mt-1" />
+        <hr className={`${COMMON_STYLES.FORM_DIVIDER} border`} />
         <FormField
           label="이름"
           id="mentor-name"
@@ -184,7 +153,7 @@ const MentoJoinForm = ({ onCancel, onSubmit }: Props) => {
           buttonLabel="인증하기"
           required
         />
-        <hr className="mt-1" />
+        <hr className={`${COMMON_STYLES.FORM_DIVIDER} border`} />
         <CareerSelect value={major} onChange={setMajor} label="전공" />
         <TopicSelect value={topic} onChange={setTopic} label="희망 상담 주제" />
         <div className="mt-2">

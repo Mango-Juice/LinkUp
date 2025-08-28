@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
-import MentoJoinForm from "../components/signup/MentoJoinForm";
-import MenteeJoinForm from "../components/signup/MenteeJoinForm";
-import RoleButton from "../components/signup/RoleButton";
+import MentoJoinForm from "../features/signup/components/MentoJoinForm";
+import MenteeJoinForm from "../features/signup/components/MenteeJoinForm";
+import RoleButton from "../features/signup/components/RoleButton";
 import type { Role } from "../types/UserInfo";
 import { useNavigate } from "react-router-dom";
 
@@ -19,28 +19,28 @@ const SignUp = () => {
   }, [role]);
 
   return (
-    <div className="flex flex-row items-start justify-center my-7">
+    <div className="flex flex-col lg:flex-row items-start justify-center mx-4 md:mx-6 my-6 md:my-8 gap-6 lg:gap-8">
       <SelectRoleSection
         onMentoClicked={() => setRole("mentor")}
         onMenteeClicked={() => setRole("mentee")}
         role={role}
       />
       <div
-        className={`transition-[width] duration-300 ease-out flex-shrink-0 ${
-          role ? "w-[20px]" : "w-0"
+        className={`transition-all duration-300 ease-out flex-shrink-0 ${
+          role ? "lg:w-[20px] w-0" : "w-0"
         }`}
         aria-hidden={!role}
       />
       <div
-        className={`relative ${
+        className={`relative w-full lg:w-auto ${
           role ? "pointer-events-auto" : "pointer-events-none"
         }`}
       >
         <div
-          className={`transition-all duration-300 ease-out origin-left ${
+          className={`transition-all duration-300 ease-out origin-top lg:origin-left ${
             showForm && role
-              ? "opacity-100 translate-x-0 scale-100"
-              : "opacity-0 -translate-x-4 scale-95"
+              ? "opacity-100 translate-y-0 lg:translate-x-0 scale-100"
+              : "opacity-0 -translate-y-4 lg:-translate-x-4 scale-95"
           }`}
         >
           {role === "mentor" && (
@@ -72,7 +72,7 @@ const SelectRoleSection = ({
   role,
 }: SelectRoleSectionProps) => {
   return (
-    <div className="flex gap-6">
+    <div className="flex flex-col sm:flex-row gap-4 md:gap-6 w-full sm:w-auto justify-center items-center sm:justify-center">
       {role !== "mentee" && (
         <RoleButton
           icon="mentor_icon.png"

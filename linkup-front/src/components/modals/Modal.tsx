@@ -1,6 +1,7 @@
 import { IoClose } from "react-icons/io5";
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
+import { COMMON_STYLES, ANIMATION_CONFIG } from "../../constants/styles";
 
 interface ModalProps {
   isOpen: boolean;
@@ -38,7 +39,7 @@ const Modal = ({
           transition={{ duration: durationMs / 1000 }}
         >
           <motion.div
-            className="absolute inset-0 bg-black/50"
+            className={COMMON_STYLES.MODAL_BACKDROP}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -46,21 +47,21 @@ const Modal = ({
           />
           <motion.div
             onClick={(e) => e.stopPropagation()}
-            className="bg-white dark:bg-neutral-900 p-8 rounded-xl shadow-md relative z-10"
-            initial={{ opacity: 0, scale: 0.9, y: 20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.9, y: 20 }}
-            transition={{ 
-              duration: durationMs / 1000, 
+            className={`${COMMON_STYLES.MODAL_CONTENT} sm:max-w-md md:max-w-lg lg:max-w-xl`}
+            initial={ANIMATION_CONFIG.MODAL.INITIAL}
+            animate={ANIMATION_CONFIG.MODAL.ANIMATE}
+            exit={ANIMATION_CONFIG.MODAL.EXIT}
+            transition={{
+              duration: durationMs / 1000,
               ease: "easeOut",
               scale: { duration: durationMs / 1000 },
-              opacity: { duration: durationMs / 1500 }
+              opacity: { duration: durationMs / 1500 },
             }}
           >
             {hasExitButton && (
               <IoClose
                 onClick={onClose}
-                className="cursor-pointer absolute top-2 right-2 text-xl text-neutral-600 dark:text-neutral-400 hover:opacity-70 transition-opacity"
+                className="absolute text-xl transition-opacity cursor-pointer top-2 right-2 text-neutral-600 dark:text-neutral-400 hover:opacity-70"
                 aria-label="닫기"
               />
             )}

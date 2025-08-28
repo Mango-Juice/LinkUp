@@ -1,5 +1,5 @@
 import { API_URL } from "../config";
-import useAuthStore from "../store/useAuthStore";
+import useAuthStore from "../stores/useAuthStore";
 
 const DEFAULT_TIMEOUT_MS = 10000; // 10초 기본 타임아웃
 

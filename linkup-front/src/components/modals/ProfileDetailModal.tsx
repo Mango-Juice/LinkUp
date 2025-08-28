@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import Avatar, { genConfig, type AvatarFullConfig } from "react-nice-avatar";
 import { IoClose, IoCafe } from "react-icons/io5";
 import Modal from "./Modal";
-import PrimaryButton from "../PrimaryButton";
+import PrimaryButton from "../ui/PrimaryButton";
 import type { MentorInfo } from "../../types/MentorInfo";
 import type { MenteeInfo } from "../../types/MenteeInfo";
 import { toast } from "react-toastify";
@@ -96,7 +96,7 @@ const ProfileDetailModal = ({
           </h2>
           <motion.button
             onClick={handleClose}
-            className="p-2 bg-transparent border-0 rounded-lg transition-all duration-200"
+            className="p-2 transition-all duration-300 bg-transparent border-0 rounded-lg"
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
           >
@@ -111,20 +111,20 @@ const ProfileDetailModal = ({
           transition={{ duration: 0.2, delay: 0.1 }}
         >
           <Avatar
-            className="w-32 h-32 rounded-full ring-4 ring-primary-100 dark:ring-primary-900/30 shadow-lg mb-4"
+            className="w-32 h-32 mb-4 rounded-full shadow-lg ring-4 ring-primary-100 dark:ring-primary-900/30"
             {...avatarConfig}
           />
-          <h3 className="text-2xl font-bold text-neutral-900 dark:text-neutral-100 mb-2">
+          <h3 className="mb-2 text-2xl font-bold text-neutral-900 dark:text-neutral-100">
             {profile.name}
           </h3>
 
           {isMentorProfile ? (
             <>
-              <p className="text-sm text-neutral-600 dark:text-neutral-400 mb-3">
+              <p className="mb-3 text-sm text-neutral-600 dark:text-neutral-400">
                 {profile.jobTitle}
               </p>
               <motion.div
-                className="flex flex-wrap gap-2 justify-center mb-4"
+                className="flex flex-wrap justify-center gap-2 mb-4"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{
@@ -139,7 +139,7 @@ const ProfileDetailModal = ({
                   .map((tag, index) => (
                     <motion.span
                       key={tag}
-                      className="px-3 py-1 rounded-full bg-primary-100 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400 text-xs font-medium"
+                      className="px-3 py-1 text-xs font-medium rounded-full bg-primary-100 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400"
                       initial={{ opacity: 0, scale: 0.8 }}
                       animate={{ opacity: 1, scale: 1 }}
                       transition={{
@@ -154,11 +154,11 @@ const ProfileDetailModal = ({
             </>
           ) : (
             <>
-              <p className="text-sm text-neutral-600 mb-1">
+              <p className="mb-1 text-sm text-neutral-600 dark:text-neutral-400">
                 {profile.age}세 • {profile.grade} • {profile.region}
               </p>
               <motion.div
-                className="flex flex-wrap gap-2 justify-center mt-3 mb-4"
+                className="flex flex-wrap justify-center gap-2 mt-3 mb-4"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{
@@ -173,7 +173,7 @@ const ProfileDetailModal = ({
                   .map((interest, index) => (
                     <motion.span
                       key={interest}
-                      className="px-3 py-1 rounded-full bg-primary-100 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400 text-xs font-medium"
+                      className="px-3 py-1 text-xs font-medium rounded-full bg-primary-100 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400"
                       initial={{ opacity: 0, scale: 0.8 }}
                       animate={{ opacity: 1, scale: 1 }}
                       transition={{
@@ -222,7 +222,7 @@ const ProfileDetailModal = ({
               transition={{ duration: 0.2, ease: "easeInOut" }}
             >
               <motion.div
-                className="border-t border-neutral-200 pt-4"
+                className="pt-4 border-t border-neutral-200 dark:border-neutral-700"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.2, delay: 0.05 }}
@@ -233,7 +233,7 @@ const ProfileDetailModal = ({
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ duration: 0.2, delay: 0.08 }}
                 >
-                  <label className="block text-sm font-medium text-neutral-600 mb-2">
+                  <label className="block mb-2 text-sm font-medium text-neutral-600 dark:text-neutral-400">
                     날짜 선택
                   </label>
                   <input
@@ -244,7 +244,7 @@ const ProfileDetailModal = ({
                       setSelectedDate((e.target as HTMLInputElement).value)
                     }
                     min={new Date().toISOString().split("T")[0]}
-                    className="w-full px-3 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500/30 focus:border-primary-500 text-sm transition-all"
+                    className="w-full px-3 py-2 text-sm transition-all duration-300 bg-white border rounded-lg border-neutral-300 dark:border-neutral-600 dark:bg-neutral-800 text-neutral-900 dark:text-neutral-100 focus:outline-none focus:ring-2 focus:ring-primary-500/30 focus:border-primary-500"
                     required
                   />
                 </motion.div>
@@ -255,7 +255,7 @@ const ProfileDetailModal = ({
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ duration: 0.2, delay: 0.1 }}
                 >
-                  <label className="block text-sm font-medium text-neutral-600 mb-2">
+                  <label className="block mb-2 text-sm font-medium text-neutral-600 dark:text-neutral-400">
                     시간 선택
                   </label>
                   <div className="grid grid-cols-3 gap-2">
@@ -264,10 +264,10 @@ const ProfileDetailModal = ({
                         key={time}
                         type="button"
                         onClick={() => setSelectedTime(time)}
-                        className={`py-2 px-3 rounded-lg text-sm font-medium transition-all ${
+                        className={`py-2 px-3 rounded-lg text-sm font-medium transition-all duration-300 ${
                           selectedTime === time
-                            ? "bg-primary-500 text-white shadow-md"
-                            : "bg-neutral-100 text-neutral-700 hover:bg-neutral-200"
+                            ? "bg-primary-500 dark:bg-primary-600 text-white shadow-md"
+                            : "bg-neutral-100 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-neutral-600"
                         }`}
                         initial={{ opacity: 0, scale: 0.9 }}
                         animate={{ opacity: 1, scale: 1 }}
@@ -289,14 +289,14 @@ const ProfileDetailModal = ({
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ duration: 0.2, delay: 0.15 }}
                 >
-                  <label className="block text-sm font-medium text-neutral-600 mb-2">
+                  <label className="block mb-2 text-sm font-medium text-neutral-600 dark:text-neutral-400">
                     나누고 싶은 이야기 (선택)
                   </label>
                   <textarea
                     value={message}
                     onChange={(e) => setMessage(e.target.value)}
                     placeholder="어떤 이야기를 나누고 싶으신가요?"
-                    className="w-full px-3 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500/30 focus:border-primary-500 text-sm resize-none transition-all"
+                    className="w-full px-3 py-2 text-sm transition-all duration-300 bg-white border rounded-lg resize-none border-neutral-300 dark:border-neutral-600 dark:bg-neutral-800 text-neutral-900 dark:text-neutral-100 placeholder:text-neutral-400 dark:placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-primary-500/30 focus:border-primary-500"
                     rows={3}
                   />
                 </motion.div>

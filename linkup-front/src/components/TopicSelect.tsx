@@ -1,4 +1,4 @@
-import React from "react";
+import { memo } from "react";
 
 interface TopicOption {
   value: string;
@@ -21,18 +21,20 @@ interface TopicSelectProps {
   className?: string;
 }
 
-const TopicSelect: React.FC<TopicSelectProps> = ({
+const TopicSelect = memo<TopicSelectProps>(function TopicSelect({
   value,
   onChange,
   options = DEFAULT_OPTIONS,
   disabled = false,
   label = "상담 주제",
   className = "",
-}) => {
+}) {
   return (
     <div className={className}>
       {label && (
-        <div className="mb-2 text-sm font-medium text-gray-700">{label}</div>
+        <div className="mb-2 text-sm font-medium text-neutral-700 dark:text-neutral-300">
+          {label}
+        </div>
       )}
       <div className="grid grid-cols-2 gap-2">
         {options.map((opt) => {
@@ -45,11 +47,11 @@ const TopicSelect: React.FC<TopicSelectProps> = ({
               aria-checked={selected}
               disabled={disabled}
               onClick={() => !disabled && onChange(opt.value)}
-              className={`px-3 py-2 rounded-md border text-sm transition focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-primary-400
+              className={`px-3 py-2 rounded-md border text-sm transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-primary-400
               ${
                 selected
-                  ? "bg-primary-400 text-white shadow"
-                  : "bg-white hover:bg-primary-50 border-gray-300"
+                  ? "bg-primary-500 dark:bg-primary-600 text-white shadow border-primary-500 dark:border-primary-600"
+                  : "bg-white dark:bg-neutral-800 hover:bg-primary-50 dark:hover:bg-neutral-700 border-neutral-300 dark:border-neutral-600 text-neutral-900 dark:text-neutral-100"
               }
               ${disabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
             >
@@ -60,6 +62,6 @@ const TopicSelect: React.FC<TopicSelectProps> = ({
       </div>
     </div>
   );
-};
+});
 
 export default TopicSelect;

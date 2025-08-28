@@ -1,3 +1,4 @@
+import { memo, Suspense, lazy } from "react";
 import {
   BrowserRouter,
   Link,
@@ -5,12 +6,13 @@ import {
   Routes,
   useLocation,
 } from "react-router-dom";
-import Home from "./pages/Home";
-import SignUp from "./pages/SignUp";
 import Header from "./components/Header";
 import { AnimatePresence, motion } from "framer-motion";
-import Explore from "./pages/Explore";
-import Reservation from "./pages/Reservation";
+
+const Home = lazy(() => import("./pages/Home"));
+const SignUp = lazy(() => import("./pages/SignUp"));
+const Explore = lazy(() => import("./pages/Explore"));
+const Reservation = lazy(() => import("./pages/Reservation"));
 
 const pageVariants = {
   initial: { opacity: 0, y: 16 },
@@ -18,18 +20,20 @@ const pageVariants = {
   exit: { opacity: 0, y: -16 },
 };
 
-const PageWrapper = ({ children }: { children: React.ReactNode }) => (
-  <motion.div
-    variants={pageVariants}
-    initial="initial"
-    animate="animate"
-    exit="exit"
-    transition={{ duration: 0.25, ease: "easeOut" }}
-    className="min-h-[calc(100vh-5rem)]"
-  >
-    {children}
-  </motion.div>
-);
+const PageWrapper = memo<{ children: React.ReactNode }>(function PageWrapper({ children }) {
+  return (
+    <motion.div
+      variants={pageVariants}
+      initial="initial"
+      animate="animate"
+      exit="exit"
+      transition={{ duration: 0.25, ease: "easeOut" }}
+      className="min-h-[calc(100vh-5rem)]"
+    >
+      {children}
+    </motion.div>
+  );
+});
 
 const AnimatedRoutes = () => {
   const location = useLocation();
@@ -40,7 +44,9 @@ const AnimatedRoutes = () => {
           path="/"
           element={
             <PageWrapper>
-              <Home />
+              <Suspense fallback={<div className="flex items-center justify-center h-screen"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500"></div></div>}>
+                <Home />
+              </Suspense>
             </PageWrapper>
           }
         />
@@ -48,7 +54,9 @@ const AnimatedRoutes = () => {
           path="/signup"
           element={
             <PageWrapper>
-              <SignUp />
+              <Suspense fallback={<div className="flex items-center justify-center h-screen"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500"></div></div>}>
+                <SignUp />
+              </Suspense>
             </PageWrapper>
           }
         />
@@ -56,7 +64,9 @@ const AnimatedRoutes = () => {
           path="/explore"
           element={
             <PageWrapper>
-              <Explore />
+              <Suspense fallback={<div className="flex items-center justify-center h-screen"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500"></div></div>}>
+                <Explore />
+              </Suspense>
             </PageWrapper>
           }
         />
@@ -64,7 +74,9 @@ const AnimatedRoutes = () => {
           path="/reservation"
           element={
             <PageWrapper>
-              <Reservation />
+              <Suspense fallback={<div className="flex items-center justify-center h-screen"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500"></div></div>}>
+                <Reservation />
+              </Suspense>
             </PageWrapper>
           }
         />

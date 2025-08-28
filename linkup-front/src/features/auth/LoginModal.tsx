@@ -1,24 +1,18 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { toast } from "react-toastify";
-import Logo from "../Logo";
-import Modal from "./Modal";
-import FormField from "../FormField";
-import PrimaryButton from "../PrimaryButton";
+import Logo from "../../components/ui/Logo";
+import Modal from "../../components/modals/Modal";
+import FormField from "../../components/ui/FormField";
+import PrimaryButton from "../../components/ui/PrimaryButton";
 import { post, type ApiResponse } from "../../lib/api";
-import useAuthStore from "../../store/useAuthStore";
+import useAuthStore from "../../stores/useAuthStore";
 import type { UserInfo } from "../../types/UserInfo";
+import type { LoginResponse } from "../../types/auth";
 
 interface LoginModalProps {
   isOpen: boolean;
   onClose: () => void;
-}
-
-interface LoginResponse {
-  id: number;
-  accessToken: string;
-  nickname: string;
-  role: "STUDENT" | "MENTOR";
 }
 
 const LoginModal = ({ isOpen, onClose }: LoginModalProps) => {
@@ -26,9 +20,9 @@ const LoginModal = ({ isOpen, onClose }: LoginModalProps) => {
   const [pw, setPw] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
   const authorize = useAuthStore((s) => s.authorize);
 
-  // 모달이 열릴 때마다 입력 필드 초기화
   useEffect(() => {
     if (isOpen) {
       setId("");
@@ -57,6 +51,10 @@ const LoginModal = ({ isOpen, onClose }: LoginModalProps) => {
         authorize(mapped);
         toast.success("로그인 성공");
         onClose();
+
+        if (location.pathname === "/signup") {
+          navigate("/");
+        }
       } else {
         toast.error(res.error || "로그인 실패");
       }
@@ -74,16 +72,16 @@ const LoginModal = ({ isOpen, onClose }: LoginModalProps) => {
 
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
-      <div className="flex flex-col items-center w-[340px] gap-6">
+      <div className="flex flex-col items-center w-full max-w-sm gap-6 mx-auto">
         <Logo />
-        <form onSubmit={handleSubmit} className="w-full flex flex-col gap-4">
+        <form onSubmit={handleSubmit} className="flex flex-col w-full gap-4">
           <FormField
             label="이메일"
             id="login-id"
             type="text"
             value={id}
             onChange={(e) => setId(e.target.value)}
-            placeholder="이메일"
+            placeholder="이메일을 입력하세요"
             autoComplete="username"
             required
           />
@@ -93,11 +91,11 @@ const LoginModal = ({ isOpen, onClose }: LoginModalProps) => {
             type="password"
             value={pw}
             onChange={(e) => setPw(e.target.value)}
-            placeholder="비밀번호"
+            placeholder="비밀번호를 입력하세요"
             autoComplete="current-password"
             required
           />
-          <div className="flex flex-col gap-2 mt-2">
+          <div className="flex flex-col gap-2 mt-4">
             <PrimaryButton
               type="submit"
               onClick={handleSubmit}

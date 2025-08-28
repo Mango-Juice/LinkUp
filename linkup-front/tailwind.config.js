@@ -61,6 +61,10 @@ export default {
         card: "#FFFFFF",
         secondary: "#F8FAFC",
         accent: "#F1F5F9",
+        "dark-default": "#171717",
+        "dark-card": "#262626",
+        "dark-secondary": "#1F1F1F",
+        "dark-accent": "#0A0A0A",
       },
       borderColor: {
         DEFAULT: "#E5E5E5",

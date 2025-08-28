@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Avatar, { genConfig, type AvatarFullConfig } from "react-nice-avatar";
 import { IoCafe, IoTime, IoCheckmark, IoClose } from "react-icons/io5";
-import useAuthStore from "../store/useAuthStore";
+import useAuthStore from "../stores/useAuthStore";
 import { get, post, type ApiResponse } from "../lib/api";
 import { toast } from "react-toastify";
 import { LoadingText, ErrorText } from "../components/common/LoadingError";
@@ -40,6 +40,7 @@ const Reservation = () => {
 
   useEffect(() => {
     if (!user) {
+      toast.warn("로그인이 필요한 기능입니다.");
       navigate("/", { state: { openLogin: true } });
     }
   }, [user, navigate]);
@@ -78,7 +79,6 @@ const Reservation = () => {
       });
       if (res.success) {
         toast.success("예약을 수락했습니다!");
-        // 목록 새로고침
         setAllBookings(
           allBookings.map((b) =>
             b.id === bookingId ? { ...b, status: "APPROVED" as const } : b
@@ -154,12 +154,12 @@ const Reservation = () => {
   });
 
   return (
-    <div className="m-6">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-neutral-900 dark:text-neutral-100 mb-2">
+    <div className="mx-4 my-4 md:mx-6 md:my-6">
+      <div className="mb-6 md:mb-8">
+        <h1 className="mb-2 text-2xl font-bold md:text-3xl text-neutral-900 dark:text-neutral-100">
           내 예약
         </h1>
-        <p className="text-neutral-600 dark:text-neutral-400 mb-6">
+        <p className="mb-4 text-neutral-600 dark:text-neutral-400 md:mb-6">
           커피챗 예약 현황을 확인하세요
         </p>
 
@@ -175,10 +175,10 @@ const Reservation = () => {
         {loading && <LoadingText />}
         {!loading && error && <ErrorText message={error} />}
         {!loading && !error && allBookings.length === 0 && (
-          <div className="text-center py-12">
-            <IoCafe className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-            <p className="text-gray-500 text-lg">예약이 없습니다</p>
-            <p className="text-gray-400 text-sm mt-2">
+          <div className="py-12 text-center">
+            <IoCafe className="w-16 h-16 mx-auto mb-4 text-gray-300" />
+            <p className="text-lg text-gray-500">예약이 없습니다</p>
+            <p className="mt-2 text-sm text-gray-400">
               멘토나 멘티에게 커피챗을 제안해보세요!
             </p>
           </div>
@@ -187,12 +187,12 @@ const Reservation = () => {
           !error &&
           filteredBookings.length === 0 &&
           allBookings.length > 0 && (
-            <div className="text-center py-12">
-              <IoCafe className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-              <p className="text-gray-500 text-lg">
+            <div className="py-12 text-center">
+              <IoCafe className="w-16 h-16 mx-auto mb-4 text-gray-300" />
+              <p className="text-lg text-gray-500">
                 해당 조건의 예약이 없습니다
               </p>
-              <p className="text-gray-400 text-sm mt-2">
+              <p className="mt-2 text-sm text-gray-400">
                 다른 필터 조건을 선택해보세요
               </p>
             </div>
@@ -241,12 +241,12 @@ const FilterTabs = ({
   ];
 
   return (
-    <div className="flex flex-row gap-20 justify-center">
+    <div className="flex flex-row justify-center gap-20">
       <div>
-        <span className="text-sm font-medium text-neutral-700 dark:text-neutral-300 mr-4 underline">
+        <span className="mr-4 text-sm font-medium underline text-neutral-700 dark:text-neutral-300">
           상태
         </span>
-        <div className="inline-flex gap-2 flex-wrap">
+        <div className="inline-flex flex-wrap gap-2">
           {statusTabs.map((tab) => (
             <button
               key={tab.key}
@@ -254,7 +254,7 @@ const FilterTabs = ({
               className={`px-3 py-2 rounded-lg text-sm font-medium transition-all ${
                 filterStatus === tab.key
                   ? "bg-primary-500 text-white shadow-md"
-                  : "bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-neutral-700"
+                  : "bg-neutral-200 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-neutral-700"
               }`}
             >
               {tab.label}
@@ -264,10 +264,10 @@ const FilterTabs = ({
       </div>
 
       <div>
-        <span className="text-sm font-medium text-neutral-700 dark:text-neutral-300 mr-4 underline">
-          역할
+        <span className="mr-4 text-sm font-medium underline text-neutral-700 dark:text-neutral-300">
+          제안자
         </span>
-        <div className="inline-flex gap-2 flex-wrap">
+        <div className="inline-flex flex-wrap gap-2">
           {roleTabs.map((tab) => (
             <button
               key={tab.key}
@@ -275,7 +275,7 @@ const FilterTabs = ({
               className={`px-3 py-2 rounded-lg text-sm font-medium transition-all ${
                 filterRole === tab.key
                   ? "bg-primary-500 text-white shadow-md"
-                  : "bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-neutral-700"
+                  : "bg-neutral-200 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-neutral-700"
               }`}
             >
               {tab.label}
@@ -307,12 +307,12 @@ const BookingCard = ({
   const avatarConfig: AvatarFullConfig = genConfig(otherUser.nickname);
 
   return (
-    <div className="bg-white dark:bg-neutral-800 rounded-xl p-6 shadow-sm border border-neutral-200 dark:border-neutral-700">
+    <div className="p-6 bg-white border shadow-sm dark:bg-neutral-800 rounded-xl border-neutral-200 dark:border-neutral-700">
       <div className="flex items-start gap-4">
         <Avatar className="w-12 h-12 rounded-full" {...avatarConfig} />
 
         <div className="flex-1">
-          <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center justify-between mb-1">
             <div>
               <h3 className="font-semibold text-neutral-900 dark:text-neutral-100">
                 {otherUser.nickname}
@@ -337,7 +337,7 @@ const BookingCard = ({
             </div>
           </div>
 
-          <div className="flex items-center gap-4 text-sm text-neutral-600 dark:text-neutral-400 mb-3">
+          <div className="flex items-center gap-4 mb-3 text-sm text-neutral-600 dark:text-neutral-400">
             <div className="flex items-center gap-1">
               <IoTime className="w-4 h-4" />
               <span>{new Date(booking.createdAt).toLocaleDateString()}</span>
@@ -346,7 +346,7 @@ const BookingCard = ({
 
           <div className="flex flex-row gap-5">
             {booking.note && (
-              <div className="flex-grow bg-neutral-100 dark:bg-neutral-700 rounded-lg p-3 mt-3">
+              <div className="flex-grow p-3 rounded-lg bg-neutral-100 dark:bg-neutral-700">
                 <p className="text-sm text-neutral-700 dark:text-neutral-300">
                   메모: "{booking.note}"
                 </p>
@@ -354,7 +354,7 @@ const BookingCard = ({
             )}
 
             {booking.rejectReason && booking.status === "REJECTED" && (
-              <div className="flex-grow bg-red-50 dark:bg-red-900/20 rounded-lg p-3 mt-3">
+              <div className="flex-grow p-3 rounded-lg bg-red-50 dark:bg-red-900/20">
                 <p className="text-sm text-red-700 dark:text-red-300">
                   거절 사유: "{booking.rejectReason}"
                 </p>
@@ -364,17 +364,17 @@ const BookingCard = ({
 
           {/* Action buttons */}
           {booking.status === "PENDING" && !isProposer && (
-            <div className="mt-4 flex gap-2 justify-end">
+            <div className="flex justify-end gap-2 mt-4">
               <button
                 onClick={() => onApprove(booking.id)}
-                className="flex items-center gap-2 px-4 py-2 bg-green-400 hover:bg-green-500 border-0 text-white rounded-lg text-sm font-medium transition-colors"
+                className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white transition-colors bg-green-400 border-0 rounded-lg hover:bg-green-500"
               >
                 <IoCheckmark className="w-4 h-4" />
                 수락
               </button>
               <button
                 onClick={() => onReject(booking.id)}
-                className="flex items-center gap-2 px-4 py-2 bg-red-400 hover:bg-red-500 border-0 text-white rounded-lg text-sm font-medium transition-colors"
+                className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white transition-colors bg-red-400 border-0 rounded-lg hover:bg-red-500"
               >
                 <IoClose className="w-4 h-4" />
                 거절
