@@ -2,20 +2,34 @@ import type { MentorInfo } from "../types/MentorInfo";
 import type { MenteeInfo } from "../types/MenteeInfo";
 
 export const mockMentors: MentorInfo[] = [
-  { id: 1, name: "이하늘", jobTitle: "패션 MD", tags: "패션,MD,브랜드" },
+  {
+    id: 1,
+    nickname: "이하늘",
+    name: "이하늘",
+    jobTitle: "패션 MD",
+    tags: "패션,MD,브랜드",
+  },
   {
     id: 2,
+    nickname: "정유진",
     name: "정유진",
     jobTitle: "금융 애널리스트",
     tags: "증권,리서치,투자",
   },
   {
     id: 3,
+    nickname: "박성호",
     name: "박성호",
     jobTitle: "항공 승무원",
     tags: "서비스,에티켓,항공",
   },
-  { id: 4, name: "김라온", jobTitle: "게임 기획자", tags: "게임,기획,스토리" },
+  {
+    id: 4,
+    nickname: "김라온",
+    name: "김라온",
+    jobTitle: "게임 기획자",
+    tags: "게임,기획,스토리",
+  },
 ];
 
 export const mockMentees: MenteeInfo[] = [
@@ -60,48 +74,56 @@ export const mockMentees: MenteeInfo[] = [
 export const showcaseMentors: MentorInfo[] = [
   {
     id: 1,
+    nickname: "김지훈",
     name: "김지훈",
     tags: "백엔드,Java,대기업",
     jobTitle: "카카오 백엔드 개발자",
   },
   {
     id: 2,
+    nickname: "이서윤",
     name: "이서윤",
     tags: "프론트엔드,React,UI/UX",
     jobTitle: "네이버 FE 엔지니어",
   },
   {
     id: 3,
+    nickname: "박민수",
     name: "박민수",
     tags: "데이터,AI,파이썬",
     jobTitle: "쿠팡 ML 엔지니어",
   },
   {
     id: 4,
+    nickname: "정다은",
     name: "정다은",
     tags: "해외취업,Resume,영어",
     jobTitle: "실리콘밸리 SDE",
   },
   {
     id: 5,
+    nickname: "한태호",
     name: "한태호",
     tags: "스타트업,창업,IR",
     jobTitle: "CTO",
   },
   {
     id: 6,
+    nickname: "오유진",
     name: "오유진",
     tags: "UX,프로덕트,리서치",
     jobTitle: "프로덕트 디자이너",
   },
   {
     id: 7,
+    nickname: "최현우",
     name: "최현우",
     tags: "모바일,iOS,Swift",
     jobTitle: "iOS 개발자",
   },
   {
     id: 8,
+    nickname: "배수진",
     name: "배수진",
     tags: "클라우드,AWS,DevOps",
     jobTitle: "클라우드 엔지니어",

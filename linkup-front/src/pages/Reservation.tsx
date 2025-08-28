@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Avatar, { genConfig, type AvatarFullConfig } from "react-nice-avatar";
-import { IoCafe, IoTime, IoCalendar, IoCheckmark, IoClose } from "react-icons/io5";
+import { IoCafe, IoTime, IoCheckmark, IoClose } from "react-icons/io5";
 import useAuthStore from "../store/useAuthStore";
 import { get, post, type ApiResponse } from "../lib/api";
 import { toast } from "react-toastify";
@@ -18,13 +18,14 @@ interface BookingUser {
 
 interface Booking {
   id: number;
-  status: "PENDING" | "ACCEPTED" | "REJECTED" | "CANCELLED";
+  status: "PENDING" | "APPROVED" | "REJECTED" | "CANCELLED";
   student: BookingUser;
   mentor: BookingUser;
-  proposerId: number;
-  message: string;
-  preferredTimeText: string;
+  proposer: BookingUser;
+  note: string;
+  rejectReason: string | null;
   createdAt: string;
+  updatedAt: string;
 }
 
 const Reservation = () => {
@@ -34,6 +35,7 @@ const Reservation = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [filterStatus, setFilterStatus] = useState<string>("all");
+  const [filterRole, setFilterRole] = useState<string>("all");
 
   useEffect(() => {
     if (!user) {
@@ -47,13 +49,16 @@ const Reservation = () => {
     const fetchBookings = async () => {
       setLoading(true);
       setError(null);
-      
+
       try {
         const params = new URLSearchParams();
         if (filterStatus !== "all") {
           params.append("status", filterStatus);
         }
-        
+        if (filterRole !== "all") {
+          params.append("as", filterRole);
+        }
+
         const res: ApiResponse<Booking[]> = await get<Booking[]>(
           `/bookings/me${params.toString() ? `?${params.toString()}` : ""}`
         );
@@ -71,38 +76,60 @@ const Reservation = () => {
     };
 
     fetchBookings();
-  }, [user, filterStatus]);
+  }, [user, filterStatus, filterRole]);
 
   const handleApproveBooking = async (bookingId: number) => {
     try {
-      const res = await post(`/bookings/${bookingId}/approve`, {});
+      const res = await post(`/bookings/${bookingId}/decision`, {
+        approve: true,
+      });
       if (res.success) {
         toast.success("예약을 수락했습니다!");
         // 목록 새로고침
-        setBookings(bookings.map(b => 
-          b.id === bookingId ? { ...b, status: "ACCEPTED" as const } : b
-        ));
+        setBookings(
+          bookings.map((b) =>
+            b.id === bookingId ? { ...b, status: "APPROVED" as const } : b
+          )
+        );
       } else {
         toast.error(res.error || "수락에 실패했습니다.");
       }
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "수락에 실패했습니다.");
+      toast.error(
+        error instanceof Error ? error.message : "수락에 실패했습니다."
+      );
     }
   };
 
   const handleRejectBooking = async (bookingId: number) => {
+    const reason = window.prompt("거절 사유를 입력해주세요 (선택사항):");
+    if (reason === null) return; // 사용자가 취소한 경우
+
     try {
-      const res = await post(`/bookings/${bookingId}/reject`, {});
+      const res = await post(`/bookings/${bookingId}/decision`, {
+        approve: false,
+        reason: reason || "거절했습니다.",
+      });
       if (res.success) {
         toast.success("예약을 거절했습니다.");
-        setBookings(bookings.map(b => 
-          b.id === bookingId ? { ...b, status: "REJECTED" as const } : b
-        ));
+        setBookings(
+          bookings.map((b) =>
+            b.id === bookingId
+              ? {
+                  ...b,
+                  status: "REJECTED" as const,
+                  rejectReason: reason || "거절했습니다.",
+                }
+              : b
+          )
+        );
       } else {
         toast.error(res.error || "거절에 실패했습니다.");
       }
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "거절에 실패했습니다.");
+      toast.error(
+        error instanceof Error ? error.message : "거절에 실패했습니다."
+      );
     }
   };
 
@@ -111,14 +138,18 @@ const Reservation = () => {
       const res = await post(`/bookings/${bookingId}/cancel`, {});
       if (res.success) {
         toast.success("예약을 취소했습니다.");
-        setBookings(bookings.map(b => 
-          b.id === bookingId ? { ...b, status: "CANCELLED" as const } : b
-        ));
+        setBookings(
+          bookings.map((b) =>
+            b.id === bookingId ? { ...b, status: "CANCELLED" as const } : b
+          )
+        );
       } else {
         toast.error(res.error || "취소에 실패했습니다.");
       }
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "취소에 실패했습니다.");
+      toast.error(
+        error instanceof Error ? error.message : "취소에 실패했습니다."
+      );
     }
   };
 
@@ -126,10 +157,9 @@ const Reservation = () => {
     return null;
   }
 
-
   const getCurrentUserId = () => {
     try {
-      const payload = JSON.parse(window.atob(user.token.split('.')[1]));
+      const payload = JSON.parse(window.atob(user.token.split(".")[1]));
       return payload.id || 0;
     } catch {
       return 0;
@@ -137,7 +167,8 @@ const Reservation = () => {
   };
 
   const currentUserId = getCurrentUserId();
-  const isProposer = (booking: Booking) => booking.proposerId === currentUserId;
+  const isProposer = (booking: Booking) =>
+    booking.proposer.id === currentUserId;
 
   return (
     <div className="m-6">
@@ -148,10 +179,12 @@ const Reservation = () => {
         <p className="text-neutral-600 dark:text-neutral-400 mb-6">
           커피챗 예약 현황을 확인하세요
         </p>
-        
+
         <FilterTabs
           filterStatus={filterStatus}
           setFilterStatus={setFilterStatus}
+          filterRole={filterRole}
+          setFilterRole={setFilterRole}
         />
       </div>
 
@@ -167,64 +200,104 @@ const Reservation = () => {
             </p>
           </div>
         )}
-        {!loading && !error && bookings.map((booking) => (
-          <BookingCard 
-            key={booking.id} 
-            booking={booking} 
-            isProposer={isProposer(booking)}
-            currentUserId={currentUserId}
-            onApprove={handleApproveBooking}
-            onReject={handleRejectBooking}
-            onCancel={handleCancelBooking}
-          />
-        ))}
+        {!loading &&
+          !error &&
+          bookings.map((booking) => (
+            <BookingCard
+              key={booking.id}
+              booking={booking}
+              isProposer={isProposer(booking)}
+              currentUserId={currentUserId}
+              onApprove={handleApproveBooking}
+              onReject={handleRejectBooking}
+              onCancel={handleCancelBooking}
+            />
+          ))}
       </div>
     </div>
   );
 };
 
-const FilterTabs = ({ 
-  filterStatus, 
-  setFilterStatus 
-}: { 
+const FilterTabs = ({
+  filterStatus,
+  setFilterStatus,
+  filterRole,
+  setFilterRole,
+}: {
   filterStatus: string;
   setFilterStatus: (status: string) => void;
+  filterRole: string;
+  setFilterRole: (role: string) => void;
 }) => {
-  const tabs = [
+  const statusTabs = [
     { key: "all", label: "전체" },
     { key: "PENDING", label: "대기중" },
-    { key: "ACCEPTED", label: "수락됨" },
+    { key: "APPROVED", label: "수락됨" },
     { key: "REJECTED", label: "거절됨" },
     { key: "CANCELLED", label: "취소됨" },
   ];
 
+  const roleTabs = [
+    { key: "all", label: "전체" },
+    { key: "proposer", label: "내가 제안" },
+    { key: "participant", label: "상대방 제안" },
+  ];
+
   return (
-    <div className="flex gap-2 mb-6">
-      {tabs.map((tab) => (
-        <button
-          key={tab.key}
-          onClick={() => setFilterStatus(tab.key)}
-          className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-            filterStatus === tab.key
-              ? "bg-primary-500 text-white shadow-md"
-              : "bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-neutral-700"
-          }`}
-        >
-          {tab.label}
-        </button>
-      ))}
+    <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
+      <div>
+        <h3 className="text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-3">
+          상태
+        </h3>
+        <div className="flex gap-2 flex-wrap">
+          {statusTabs.map((tab) => (
+            <button
+              key={tab.key}
+              onClick={() => setFilterStatus(tab.key)}
+              className={`px-3 py-2 rounded-lg text-sm font-medium transition-all ${
+                filterStatus === tab.key
+                  ? "bg-primary-500 text-white shadow-md"
+                  : "bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-neutral-700"
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div>
+        <h3 className="text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-3">
+          역할
+        </h3>
+        <div className="flex gap-2 flex-wrap">
+          {roleTabs.map((tab) => (
+            <button
+              key={tab.key}
+              onClick={() => setFilterRole(tab.key)}
+              className={`px-3 py-2 rounded-lg text-sm font-medium transition-all ${
+                filterRole === tab.key
+                  ? "bg-primary-500 text-white shadow-md"
+                  : "bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-neutral-700"
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+      </div>
     </div>
   );
 };
 
-const BookingCard = ({ 
-  booking, 
+const BookingCard = ({
+  booking,
   isProposer,
   currentUserId,
   onApprove,
   onReject,
-  onCancel
-}: { 
+  onCancel,
+}: {
   booking: Booking;
   isProposer: boolean;
   currentUserId: number;
@@ -235,12 +308,12 @@ const BookingCard = ({
   const otherUser = isProposer ? booking.mentor : booking.student;
   const isMentorBooking = booking.mentor.id === currentUserId;
   const avatarConfig: AvatarFullConfig = genConfig(otherUser.nickname);
-  
+
   return (
     <div className="bg-white dark:bg-neutral-800 rounded-xl p-6 shadow-sm border border-neutral-200 dark:border-neutral-700">
       <div className="flex items-start gap-4">
         <Avatar className="w-12 h-12 rounded-full" {...avatarConfig} />
-        
+
         <div className="flex-1">
           <div className="flex items-center justify-between mb-2">
             <div>
@@ -258,7 +331,7 @@ const BookingCard = ({
                 </p>
               )}
             </div>
-            
+
             <div className="flex items-center gap-2">
               {getStatusBadge(booking.status)}
               <span className="text-xs text-neutral-500 dark:text-neutral-400">
@@ -266,22 +339,26 @@ const BookingCard = ({
               </span>
             </div>
           </div>
-          
+
           <div className="flex items-center gap-4 text-sm text-neutral-600 dark:text-neutral-400 mb-3">
-            <div className="flex items-center gap-1">
-              <IoCalendar className="w-4 h-4" />
-              <span>{booking.preferredTimeText}</span>
-            </div>
             <div className="flex items-center gap-1">
               <IoTime className="w-4 h-4" />
               <span>{new Date(booking.createdAt).toLocaleDateString()}</span>
             </div>
           </div>
-          
-          {booking.message && (
+
+          {booking.note && (
             <div className="bg-neutral-50 dark:bg-neutral-700 rounded-lg p-3 mt-3">
               <p className="text-sm text-neutral-700 dark:text-neutral-300">
-                "{booking.message}"
+                "{booking.note}"
+              </p>
+            </div>
+          )}
+
+          {booking.rejectReason && booking.status === "REJECTED" && (
+            <div className="bg-red-50 dark:bg-red-900/20 rounded-lg p-3 mt-3">
+              <p className="text-sm text-red-700 dark:text-red-300">
+                거절 사유: "{booking.rejectReason}"
               </p>
             </div>
           )}
@@ -327,15 +404,32 @@ const BookingCard = ({
 
 const getStatusBadge = (status: Booking["status"]) => {
   const statusConfig = {
-    PENDING: { text: "대기중", className: "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-400" },
-    ACCEPTED: { text: "수락됨", className: "bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400" },
-    REJECTED: { text: "거절됨", className: "bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-400" },
-    CANCELLED: { text: "취소됨", className: "bg-gray-100 dark:bg-gray-900/30 text-gray-800 dark:text-gray-400" },
+    PENDING: {
+      text: "대기중",
+      className:
+        "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-400",
+    },
+    APPROVED: {
+      text: "수락됨",
+      className:
+        "bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400",
+    },
+    REJECTED: {
+      text: "거절됨",
+      className: "bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-400",
+    },
+    CANCELLED: {
+      text: "취소됨",
+      className:
+        "bg-gray-100 dark:bg-gray-900/30 text-gray-800 dark:text-gray-400",
+    },
   };
-  
+
   const config = statusConfig[status];
   return (
-    <span className={`px-2 py-1 rounded-full text-xs font-medium ${config.className}`}>
+    <span
+      className={`px-2 py-1 rounded-full text-xs font-medium ${config.className}`}
+    >
       {config.text}
     </span>
   );

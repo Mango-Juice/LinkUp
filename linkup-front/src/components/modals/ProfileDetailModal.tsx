@@ -38,18 +38,23 @@ const ProfileDetailModal = ({
 
   const handleBookingSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     try {
-      const preferredTimeText = `${selectedDate} ${selectedTime}`;
-      
+      const time = `${selectedDate} ${selectedTime}`;
+
+      const profileId = isMentorProfile
+        ? (profile as MentorInfo).id
+        : (profile as MenteeInfo).id;
+      console.log(profile);
+
       const requestBody = {
-        toMentorUserId: profileType === "mentor" ? profile.id : null,
-        toStudentUserId: profileType === "mentee" ? profile.id : null,
-        message,
-        preferredTimeText
+        ...(profileType === "mentor" && { mentorUserId: profileId }),
+        ...(profileType === "mentee" && { studentUserId: profileId }),
+        note: message,
+        time,
       };
 
-      const res = await post("/bookings/proposal", requestBody);
+      const res = await post("/bookings/propose", requestBody);
 
       if (res.success) {
         toast.success("커피챗 요청이 완료되었습니다!");
@@ -58,7 +63,9 @@ const ProfileDetailModal = ({
         toast.error(res.error || "커피챗 요청에 실패했습니다.");
       }
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "커피챗 요청에 실패했습니다.");
+      toast.error(
+        error instanceof Error ? error.message : "커피챗 요청에 실패했습니다."
+      );
     }
   };
 
@@ -136,7 +143,10 @@ const ProfileDetailModal = ({
                       className="px-3 py-1 rounded-full bg-primary-100 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400 text-xs font-medium"
                       initial={{ opacity: 0, scale: 0.8 }}
                       animate={{ opacity: 1, scale: 1 }}
-                      transition={{ duration: 0.15, delay: 0.15 + index * 0.03 }}
+                      transition={{
+                        duration: 0.15,
+                        delay: 0.15 + index * 0.03,
+                      }}
                     >
                       {tag}
                     </motion.span>
@@ -167,7 +177,10 @@ const ProfileDetailModal = ({
                       className="px-3 py-1 rounded-full bg-primary-100 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400 text-xs font-medium"
                       initial={{ opacity: 0, scale: 0.8 }}
                       animate={{ opacity: 1, scale: 1 }}
-                      transition={{ duration: 0.15, delay: 0.15 + index * 0.03 }}
+                      transition={{
+                        duration: 0.15,
+                        delay: 0.15 + index * 0.03,
+                      }}
                     >
                       {interest}
                     </motion.span>
@@ -228,6 +241,9 @@ const ProfileDetailModal = ({
                     type="date"
                     value={selectedDate}
                     onChange={(e) => setSelectedDate(e.target.value)}
+                    onInput={(e) =>
+                      setSelectedDate((e.target as HTMLInputElement).value)
+                    }
                     min={new Date().toISOString().split("T")[0]}
                     className="w-full px-3 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500/30 focus:border-primary-500 text-sm transition-all"
                     required

@@ -23,7 +23,9 @@ const Home = () => {
   const navigate = useNavigate();
   const isMentor = user?.role === "mentor";
   const [showLoginModal, setShowLoginModal] = useState(false);
-  const [selectedProfile, setSelectedProfile] = useState<MentorInfo | MenteeInfo | null>(null);
+  const [selectedProfile, setSelectedProfile] = useState<
+    MentorInfo | MenteeInfo | null
+  >(null);
   const [profileType, setProfileType] = useState<"mentor" | "mentee">("mentor");
 
   const handleAuthRequired = (callback?: () => void) => {
@@ -36,11 +38,14 @@ const Home = () => {
 
   const handleExploreClick = () => {
     handleAuthRequired(() => {
-      navigate('/explore');
+      navigate("/explore");
     });
   };
 
-  const handleProfileClick = (profile: MentorInfo | MenteeInfo, type: "mentor" | "mentee") => {
+  const handleProfileClick = (
+    profile: MentorInfo | MenteeInfo,
+    type: "mentor" | "mentee"
+  ) => {
     setSelectedProfile(profile);
     setProfileType(type);
   };
@@ -50,13 +55,13 @@ const Home = () => {
       <div className="flex flex-col lg:flex-row m-6 gap-10">
         <AvatarSection user={user} />
         {isMentor ? (
-          <MentorView 
+          <MentorView
             onAuthRequired={handleAuthRequired}
             onProfileClick={handleProfileClick}
             onExploreClick={handleExploreClick}
           />
         ) : (
-          <MenteeView 
+          <MenteeView
             onAuthRequired={handleAuthRequired}
             onProfileClick={handleProfileClick}
             onExploreClick={handleExploreClick}
@@ -83,7 +88,10 @@ const AvatarSection = ({ user }: { user: UserInfo | null }) => {
   return (
     <div className="lg:sticky lg:top-24 lg:self-start">
       <div className="bg-primary-100 dark:bg-primary-900/20 rounded-xl p-4 md:p-6 shadow-lg flex flex-col items-center gap-2 w-full lg:w-[250px] max-w-sm mx-auto lg:mx-0">
-        <Avatar className="w-20 sm:w-24 lg:w-28 h-20 sm:h-24 lg:h-28" {...avatarConfig} />
+        <Avatar
+          className="w-20 sm:w-24 lg:w-28 h-20 sm:h-24 lg:h-28"
+          {...avatarConfig}
+        />
         <div className="text-center mt-2 font-semibold text-sm text-neutral-800 dark:text-neutral-200">
           {user?.name
             ? `${user.name}님, 안녕하세요!`
@@ -113,11 +121,18 @@ const SearchStub = () => (
 
 interface ViewProps {
   onAuthRequired: (callback?: () => void) => void;
-  onProfileClick: (profile: MentorInfo | MenteeInfo, type: "mentor" | "mentee") => void;
+  onProfileClick: (
+    profile: MentorInfo | MenteeInfo,
+    type: "mentor" | "mentee"
+  ) => void;
   onExploreClick: () => void;
 }
 
-const MenteeView = ({ onAuthRequired, onProfileClick, onExploreClick }: ViewProps) => {
+const MenteeView = ({
+  onAuthRequired,
+  onProfileClick,
+  onExploreClick,
+}: ViewProps) => {
   const user = useAuthStore((s) => s.user);
   const { data, loading, error } = useMentorRecommendations(!!user);
   const cards = useMemo(
@@ -136,10 +151,10 @@ const MenteeView = ({ onAuthRequired, onProfileClick, onExploreClick }: ViewProp
       <SectionTitle>
         현직자와의 커피챗으로 진로 고민을 해결해보세요!
       </SectionTitle>
-      <CardsRowMentor 
-        loading={loading} 
-        error={error} 
-        list={cards} 
+      <CardsRowMentor
+        loading={loading}
+        error={error}
+        list={cards}
         onCardClick={handleMentorClick}
       />
       <MenteeMoreHeadline />
@@ -148,7 +163,11 @@ const MenteeView = ({ onAuthRequired, onProfileClick, onExploreClick }: ViewProp
   );
 };
 
-const MentorView = ({ onAuthRequired, onProfileClick, onExploreClick }: ViewProps) => {
+const MentorView = ({
+  onAuthRequired,
+  onProfileClick,
+  onExploreClick,
+}: ViewProps) => {
   const user = useAuthStore((s) => s.user);
   const { data, loading, error } = useMenteeRecommendations(!!user);
   const cards = useMemo(
@@ -165,9 +184,9 @@ const MentorView = ({ onAuthRequired, onProfileClick, onExploreClick }: ViewProp
   return (
     <div className="flex-1 text-start">
       <SectionTitle>학생들의 진로 고민을 해결해줄 수 있어요!</SectionTitle>
-      <CardsRowMentee 
-        loading={loading} 
-        error={error} 
+      <CardsRowMentee
+        loading={loading}
+        error={error}
         list={cards}
         onCardClick={handleMenteeClick}
       />
@@ -178,7 +197,9 @@ const MentorView = ({ onAuthRequired, onProfileClick, onExploreClick }: ViewProp
 };
 
 const SectionTitle = ({ children }: { children: React.ReactNode }) => (
-  <div className="text-xl font-semibold mb-4 text-neutral-900 dark:text-neutral-100">{children}</div>
+  <div className="text-xl font-semibold mb-4 text-neutral-900 dark:text-neutral-100">
+    {children}
+  </div>
 );
 
 const MenteeMoreHeadline = () => (
@@ -210,7 +231,11 @@ const CardsRowMentor = ({
     {!loading &&
       !error &&
       list.map((m) => (
-        <div key={m.name} onClick={() => onCardClick?.(m)} className="cursor-pointer">
+        <div
+          key={m.name}
+          onClick={() => onCardClick?.(m)}
+          className="cursor-pointer"
+        >
           <MentorCard mentor={m} />
         </div>
       ))}
@@ -234,7 +259,11 @@ const CardsRowMentee = ({
     {!loading &&
       !error &&
       list.map((s) => (
-        <div key={s.name} onClick={() => onCardClick?.(s)} className="cursor-pointer">
+        <div
+          key={s.name}
+          onClick={() => onCardClick?.(s)}
+          className="cursor-pointer"
+        >
           <MenteeCard mentee={s} />
         </div>
       ))}

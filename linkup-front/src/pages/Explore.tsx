@@ -15,7 +15,9 @@ const Explore = () => {
   const navigate = useNavigate();
   const isMentor = user?.role === "mentor";
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedProfile, setSelectedProfile] = useState<MentorInfo | MenteeInfo | null>(null);
+  const [selectedProfile, setSelectedProfile] = useState<
+    MentorInfo | MenteeInfo | null
+  >(null);
   const [profileType, setProfileType] = useState<"mentor" | "mentee">("mentor");
 
   useEffect(() => {
@@ -24,23 +26,36 @@ const Explore = () => {
     }
   }, [user, navigate]);
 
-  const { data: mentors, loading: mentorsLoading, error: mentorsError } = useMentorsExplore(!!user && !isMentor);
-  const { data: students, loading: studentsLoading, error: studentsError } = useStudentsExplore(!!user && isMentor);
+  const {
+    data: mentors,
+    loading: mentorsLoading,
+    error: mentorsError,
+  } = useMentorsExplore(!!user && !isMentor);
+  const {
+    data: students,
+    loading: studentsLoading,
+    error: studentsError,
+  } = useStudentsExplore(!!user && isMentor);
 
-  const handleProfileClick = (profile: MentorInfo | MenteeInfo, type: "mentor" | "mentee") => {
+  const handleProfileClick = (
+    profile: MentorInfo | MenteeInfo,
+    type: "mentor" | "mentee"
+  ) => {
     setSelectedProfile(profile);
     setProfileType(type);
   };
 
-  const filteredMentors = mentors.filter(mentor => 
-    mentor.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    mentor.jobTitle.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    mentor.tags.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredMentors = mentors.filter(
+    (mentor) =>
+      mentor.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      mentor.jobTitle.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      mentor.tags.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const filteredStudents = students.filter(student => 
-    student.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    student.interests.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredStudents = students.filter(
+    (student) =>
+      student.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      student.interests.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   // 로그인되지 않은 경우 렌더링하지 않음
@@ -56,13 +71,13 @@ const Explore = () => {
             {isMentor ? "학생 멘티 찾기" : "현직자 멘토 찾기"}
           </h1>
           <p className="text-neutral-600 mb-6">
-            {isMentor 
-              ? "진로 고민을 가진 학생들과 소중한 시간을 나눠보세요" 
+            {isMentor
+              ? "진로 고민을 가진 학생들과 소중한 시간을 나눠보세요"
               : "다양한 분야의 현직자 멘토분들을 만나보세요"}
           </p>
-          
-          <SearchBar 
-            searchQuery={searchQuery} 
+
+          <SearchBar
+            searchQuery={searchQuery}
             setSearchQuery={setSearchQuery}
             placeholder={isMentor ? "멘티 검색..." : "멘토 검색..."}
           />
@@ -72,7 +87,7 @@ const Explore = () => {
           <SectionTitle>
             {isMentor ? "함께 성장할 멘티들" : "경험을 나눌 멘토분들"}
           </SectionTitle>
-          
+
           {isMentor ? (
             <ExploreGrid
               items={filteredStudents}
@@ -103,11 +118,11 @@ const Explore = () => {
   );
 };
 
-const SearchBar = ({ 
-  searchQuery, 
-  setSearchQuery, 
-  placeholder 
-}: { 
+const SearchBar = ({
+  searchQuery,
+  setSearchQuery,
+  placeholder,
+}: {
   searchQuery: string;
   setSearchQuery: (query: string) => void;
   placeholder: string;
@@ -138,8 +153,14 @@ interface ExploreGridProps {
   onItemClick: (item: MentorInfo | MenteeInfo) => void;
 }
 
-const ExploreGrid = ({ items, loading, error, type, onItemClick }: ExploreGridProps) => (
-  <div className="flex flex-wrap gap-4 min-h-[190px]">
+const ExploreGrid = ({
+  items,
+  loading,
+  error,
+  type,
+  onItemClick,
+}: ExploreGridProps) => (
+  <div className="flex flex-wrap gap-4 min-h-[190px] justify-center">
     {loading && <LoadingText />}
     {!loading && error && <ErrorText message={error} />}
     {!loading && !error && items.length === 0 && (
@@ -150,9 +171,9 @@ const ExploreGrid = ({ items, loading, error, type, onItemClick }: ExploreGridPr
     {!loading &&
       !error &&
       items.map((item) => (
-        <div 
-          key={item.name} 
-          onClick={() => onItemClick(item)} 
+        <div
+          key={item.name}
+          onClick={() => onItemClick(item)}
           className="cursor-pointer"
         >
           {type === "mentor" ? (

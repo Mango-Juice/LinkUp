@@ -3,6 +3,13 @@ import { get } from "../lib/api";
 import type { MentorInfo } from "../types/MentorInfo";
 import type { MenteeInfo } from "../types/MenteeInfo";
 
+interface APIMentorResponse {
+  id: number;
+  nickname: string;
+  jobTitle: string;
+  tags: string;
+}
+
 export function useMentorsExplore(enabled: boolean) {
   const [data, setData] = useState<MentorInfo[]>([]);
   const [loading, setLoading] = useState(enabled);
@@ -15,9 +22,16 @@ export function useMentorsExplore(enabled: boolean) {
       try {
         setLoading(true);
         setError(null);
-        const response = await get<MentorInfo[]>("/mentors");
+        const response = await get<APIMentorResponse[]>("/mentors");
         if (response.success) {
-          setData(response.data);
+          const transformedData: MentorInfo[] = response.data.map((mentor) => ({
+            id: mentor.id,
+            nickname: mentor.nickname,
+            jobTitle: mentor.jobTitle,
+            tags: mentor.tags,
+            name: mentor.nickname, // nickname을 name으로 매핑
+          }));
+          setData(transformedData);
         } else {
           setError(response.error || "멘토 목록을 불러오는데 실패했습니다");
         }
@@ -58,10 +72,17 @@ export function useStudentsExplore(enabled: boolean) {
         setError(null);
         const response = await get<APIStudentResponse[]>("/students");
         if (response.success) {
-          const transformedData: MenteeInfo[] = response.data.map(student => ({
-            ...student,
-            name: student.nickname // nickname을 name으로 매핑
-          }));
+          const transformedData: MenteeInfo[] = response.data.map(
+            (student) => ({
+              id: student.id,
+              nickname: student.nickname,
+              age: student.age,
+              grade: student.grade,
+              region: student.region,
+              interests: student.interests,
+              name: student.nickname, // nickname을 name으로 매핑
+            })
+          );
           setData(transformedData);
         } else {
           setError(response.error || "학생 목록을 불러오는데 실패했습니다");

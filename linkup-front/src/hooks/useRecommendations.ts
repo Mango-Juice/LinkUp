@@ -42,7 +42,9 @@ export function useMentorRecommendations(enabled: boolean) {
           if (res.success) {
             setData(
               res.data.map((m) => ({
-                name: m.nickname,
+                id: m.id,
+                nickname: m.nickname,
+                name: m.nickname, // nickname을 name으로 매핑
                 jobTitle: m.jobTitle,
                 tags: m.tags,
               }))

@@ -40,7 +40,7 @@ const Header = () => {
           className="cursor-pointer pl-6 pr-6"
           onClick={() => navigate("/")}
         />
-        <HeaderMenu onClick={() => navigate("/")}>예약 현황</HeaderMenu>
+        <HeaderMenu onClick={() => navigate("/reservation")}>예약 현황</HeaderMenu>
         <HeaderMenu onClick={() => navigate("/")}>커피챗 내역</HeaderMenu>
         <HeaderMenu onClick={() => navigate("/")}>개인 정보</HeaderMenu>
         <HeaderMenu onClick={() => navigate("/")}>챗봇 💬</HeaderMenu>
