@@ -14,19 +14,28 @@ export const mockMentees: MenteeInfo[] = [
     grade: "고3",
     region: "서울",
     interests: "의대, 생명과학",
+    age: 19,
   },
   {
     name: "영상편집러",
     grade: "고2",
     region: "경기",
     interests: "영상, 콘텐츠",
+    age: 18,
   },
-  { name: "환경지킴이", grade: "고1", region: "부산", interests: "환경, 봉사" },
+  {
+    name: "환경지킴이",
+    grade: "고1",
+    region: "부산",
+    interests: "환경, 봉사",
+    age: 16,
+  },
   {
     name: "게임개발희망",
     grade: "고2",
     region: "대구",
     interests: "게임, 프로그래밍",
+    age: 17,
   },
 ];
 
