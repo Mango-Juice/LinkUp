@@ -78,12 +78,12 @@ const MenteeJoinForm = ({ onCancel, onSubmit }: Props) => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (signupMutation.isPending) return;
-    
+
     if (!validateEmail(userId)) {
       toast.error("올바른 이메일 형식을 입력해주세요");
       return;
     }
-    
+
     const payload: MenteeSignupPayload = {
       role: "STUDENT",
       email: userId,

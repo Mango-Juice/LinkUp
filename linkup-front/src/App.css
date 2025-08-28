@@ -75,8 +75,13 @@
   }
   
   /* 제목 텍스트를 하얗게 */
-  .text-xl.font-semibold, h2.text-xl.font-semibold {
+  .text-xl.font-semibold {
     color: #ffffff !important;
+  }
+  
+  /* 멘토/멘티 정보 입력 제목은 검정 유지 */
+  .bg-\[#F9F9F9\] h2.text-xl.font-semibold {
+    color: #1f2937 !important;
   }
   
   /* 일반 텍스트 색상 */

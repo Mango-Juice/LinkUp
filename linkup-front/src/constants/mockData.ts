@@ -10,6 +10,8 @@ export const mockMentors: MentorInfo[] = [
 
 export const mockMentees: MenteeInfo[] = [
   {
+    id: 1,
+    nickname: "고3-의대꿈나무",
     name: "고3-의대꿈나무",
     grade: "고3",
     region: "서울",
@@ -17,21 +19,27 @@ export const mockMentees: MenteeInfo[] = [
     age: 19,
   },
   {
-    name: "영상편집러",
+    id: 2,
+    nickname: "고2-IT덕후",
+    name: "고2-IT덕후",
     grade: "고2",
     region: "경기",
     interests: "영상, 콘텐츠",
     age: 18,
   },
   {
-    name: "환경지킴이",
+    id: 3,
+    nickname: "고1-환경지킴이",
+    name: "고1-환경지킴이",
     grade: "고1",
     region: "부산",
     interests: "환경, 봉사",
     age: 16,
   },
   {
-    name: "게임개발희망",
+    id: 4,
+    nickname: "고2-게임매니아",
+    name: "고2-게임매니아",
     grade: "고2",
     region: "대구",
     interests: "게임, 프로그래밍",
