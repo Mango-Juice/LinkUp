@@ -28,7 +28,6 @@ const Header = () => {
     }
   }, [location, navigate]);
 
-  // Close mobile menu when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -41,8 +40,14 @@ const Header = () => {
     };
 
     if (isMobileMenuOpen) {
-      document.addEventListener("click", handleClickOutside);
-      return () => document.removeEventListener("click", handleClickOutside);
+      const timeoutId = setTimeout(() => {
+        document.addEventListener("click", handleClickOutside, true);
+      }, 100);
+
+      return () => {
+        clearTimeout(timeoutId);
+        document.removeEventListener("click", handleClickOutside, true);
+      };
     }
   }, [isMobileMenuOpen]);
 
@@ -50,11 +55,15 @@ const Header = () => {
     if (user) {
       deauthorize();
       toast.warn("로그아웃 되었습니다.");
-      navigate("/");
+      navigate("/", { state: { openLogin: false } });
     } else {
       setIsOpen(true);
     }
   }, [user, deauthorize, navigate]);
+
+  const handleToggleMobileMenu = useCallback(() => {
+    setIsMobileMenuOpen((prev) => !prev);
+  }, []);
 
   return (
     <>
@@ -91,10 +100,11 @@ const Header = () => {
         <div className="flex items-center space-x-2 md:hidden">
           <ThemeToggle />
           <button
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="p-2 transition-all duration-300 rounded-lg text-neutral-700 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800 hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-primary-500"
+            onClick={handleToggleMobileMenu}
+            className="p-2 transition-all duration-300 border rounded-lg bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-neutral-700 border-neutral-200 dark:border-neutral-700"
             aria-label={isMobileMenuOpen ? "메뉴 닫기" : "메뉴 열기"}
             aria-expanded={isMobileMenuOpen}
+            type="button"
           >
             <motion.div
               animate={{ rotate: isMobileMenuOpen ? 180 : 0 }}
@@ -113,7 +123,7 @@ const Header = () => {
         <AnimatePresence>
           {isMobileMenuOpen && (
             <motion.div
-              className="absolute left-0 right-0 overflow-hidden bg-white border-b shadow-lg top-full dark:bg-neutral-900 border-neutral-200 dark:border-neutral-700 md:hidden"
+              className="absolute left-0 right-0 overflow-hidden bg-white border-t border-b shadow-lg top-full dark:bg-neutral-900 border-neutral-200 dark:border-neutral-700 md:hidden"
               initial={{ height: 0, opacity: 0 }}
               animate={{ height: "auto", opacity: 1 }}
               exit={{ height: 0, opacity: 0 }}
@@ -203,7 +213,7 @@ interface MobileHeaderMenuProps {
 const MobileHeaderMenu = ({ children, onClick }: MobileHeaderMenuProps) => {
   return (
     <button
-      className="w-full px-4 py-3 text-left transition-all duration-300 border-l-4 border-transparent select-none text-neutral-700 dark:text-neutral-300 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-neutral-100 dark:hover:bg-neutral-800 hover:border-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-600"
+      className="w-full px-4 py-3 text-left transition-all duration-300 bg-transparent border-l-4 border-transparent select-none text-neutral-700 dark:text-neutral-300 hover:text-primary-600 dark:hover:text-primary-400 hover:border-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-600"
       onClick={onClick}
       type="button"
     >
