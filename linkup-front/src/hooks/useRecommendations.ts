@@ -87,6 +87,8 @@ export function useMenteeRecommendations(enabled: boolean) {
           if (res.success) {
             setData(
               res.data.map((s) => ({
+                id: s.studentId,
+                nickname: s.nickname,
                 name: s.nickname,
                 grade: s.grade,
                 region: s.region,
