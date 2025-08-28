@@ -1,4 +1,5 @@
 export interface UserInfo {
+  id: number;
   token: string; // accessToken
   name: string; // nickname
   role: Role;

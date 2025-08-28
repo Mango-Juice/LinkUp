@@ -6,6 +6,7 @@ import useAuthStore from "../store/useAuthStore";
 import { get, post, type ApiResponse } from "../lib/api";
 import { toast } from "react-toastify";
 import { LoadingText, ErrorText } from "../components/common/LoadingError";
+import type { UserInfo } from "../types/UserInfo";
 
 interface BookingUser {
   id: number;
@@ -51,7 +52,9 @@ const Reservation = () => {
       setError(null);
 
       try {
-        const res: ApiResponse<Booking[]> = await get<Booking[]>("/bookings/me");
+        const res: ApiResponse<Booking[]> = await get<Booking[]>(
+          "/bookings/me"
+        );
 
         if (res.success) {
           setAllBookings(res.data);
@@ -123,42 +126,12 @@ const Reservation = () => {
     }
   };
 
-  const handleCancelBooking = async (bookingId: number) => {
-    try {
-      const res = await post(`/bookings/${bookingId}/cancel`, {});
-      if (res.success) {
-        toast.success("예약을 취소했습니다.");
-        setAllBookings(
-          allBookings.map((b) =>
-            b.id === bookingId ? { ...b, status: "CANCELLED" as const } : b
-          )
-        );
-      } else {
-        toast.error(res.error || "취소에 실패했습니다.");
-      }
-    } catch (error) {
-      toast.error(
-        error instanceof Error ? error.message : "취소에 실패했습니다."
-      );
-    }
-  };
-
   if (!user) {
     return null;
   }
 
-  const getCurrentUserId = () => {
-    try {
-      const payload = JSON.parse(window.atob(user.token.split(".")[1]));
-      return payload.id || 0;
-    } catch {
-      return 0;
-    }
-  };
-
-  const currentUserId = getCurrentUserId();
-  const isProposer = (booking: Booking) =>
-    booking.proposer.id === currentUserId;
+  const currentUserId = user.id;
+  const isProposer = (booking: Booking) => booking.proposer.id === user.id;
 
   // 로컬에서 필터링된 예약 목록
   const filteredBookings = allBookings.filter((booking) => {
@@ -210,26 +183,31 @@ const Reservation = () => {
             </p>
           </div>
         )}
-        {!loading && !error && filteredBookings.length === 0 && allBookings.length > 0 && (
-          <div className="text-center py-12">
-            <IoCafe className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-            <p className="text-gray-500 text-lg">해당 조건의 예약이 없습니다</p>
-            <p className="text-gray-400 text-sm mt-2">
-              다른 필터 조건을 선택해보세요
-            </p>
-          </div>
-        )}
+        {!loading &&
+          !error &&
+          filteredBookings.length === 0 &&
+          allBookings.length > 0 && (
+            <div className="text-center py-12">
+              <IoCafe className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+              <p className="text-gray-500 text-lg">
+                해당 조건의 예약이 없습니다
+              </p>
+              <p className="text-gray-400 text-sm mt-2">
+                다른 필터 조건을 선택해보세요
+              </p>
+            </div>
+          )}
         {!loading &&
           !error &&
           filteredBookings.map((booking) => (
             <BookingCard
+              user={user}
               key={booking.id}
               booking={booking}
               isProposer={isProposer(booking)}
               currentUserId={currentUserId}
               onApprove={handleApproveBooking}
               onReject={handleRejectBooking}
-              onCancel={handleCancelBooking}
             />
           ))}
       </div>
@@ -310,21 +288,21 @@ const FilterTabs = ({
 };
 
 const BookingCard = ({
+  user,
   booking,
   isProposer,
   currentUserId,
   onApprove,
   onReject,
-  onCancel,
 }: {
+  user: UserInfo;
   booking: Booking;
   isProposer: boolean;
   currentUserId: number;
   onApprove: (id: number) => void;
   onReject: (id: number) => void;
-  onCancel: (id: number) => void;
 }) => {
-  const otherUser = isProposer ? booking.mentor : booking.student;
+  const otherUser = user.role === "mentor" ? booking.student : booking.mentor;
   const isMentorBooking = booking.mentor.id === currentUserId;
   const avatarConfig: AvatarFullConfig = genConfig(otherUser.nickname);
 
@@ -368,7 +346,7 @@ const BookingCard = ({
 
           <div className="flex flex-row gap-5">
             {booking.note && (
-              <div className="flex-grow bg-neutral-50 dark:bg-neutral-700 rounded-lg p-3 mt-3">
+              <div className="flex-grow bg-neutral-100 dark:bg-neutral-700 rounded-lg p-3 mt-3">
                 <p className="text-sm text-neutral-700 dark:text-neutral-300">
                   메모: "{booking.note}"
                 </p>
@@ -385,36 +363,22 @@ const BookingCard = ({
           </div>
 
           {/* Action buttons */}
-          {booking.status === "PENDING" && (
+          {booking.status === "PENDING" && !isProposer && (
             <div className="mt-4 flex gap-2 justify-end">
-              {!isProposer ? (
-                // 상대방이 제안한 경우 - 수락/거절 버튼
-                <>
-                  <button
-                    onClick={() => onApprove(booking.id)}
-                    className="flex items-center gap-2 px-4 py-2 bg-green-400 hover:bg-green-500 border-0 text-white rounded-lg text-sm font-medium transition-colors"
-                  >
-                    <IoCheckmark className="w-4 h-4" />
-                    수락
-                  </button>
-                  <button
-                    onClick={() => onReject(booking.id)}
-                    className="flex items-center gap-2 px-4 py-2 bg-red-400 hover:bg-red-500 border-0 text-white rounded-lg text-sm font-medium transition-colors"
-                  >
-                    <IoClose className="w-4 h-4" />
-                    거절
-                  </button>
-                </>
-              ) : (
-                // 내가 제안한 경우 - 취소 버튼
-                <button
-                  onClick={() => onCancel(booking.id)}
-                  className="flex items-center gap-2 px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-lg text-sm font-medium transition-colors"
-                >
-                  <IoClose className="w-4 h-4" />
-                  취소
-                </button>
-              )}
+              <button
+                onClick={() => onApprove(booking.id)}
+                className="flex items-center gap-2 px-4 py-2 bg-green-400 hover:bg-green-500 border-0 text-white rounded-lg text-sm font-medium transition-colors"
+              >
+                <IoCheckmark className="w-4 h-4" />
+                수락
+              </button>
+              <button
+                onClick={() => onReject(booking.id)}
+                className="flex items-center gap-2 px-4 py-2 bg-red-400 hover:bg-red-500 border-0 text-white rounded-lg text-sm font-medium transition-colors"
+              >
+                <IoClose className="w-4 h-4" />
+                거절
+              </button>
             </div>
           )}
         </div>

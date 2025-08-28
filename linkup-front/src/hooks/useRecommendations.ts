@@ -5,7 +5,11 @@ import type { MenteeInfo } from "../types/MenteeInfo";
 
 interface MentorRecommendationDto {
   id: number;
-  nickname: string;
+  user: {
+    id: number;
+    email: string;
+    nickname: string;
+  };
   jobTitle: string;
   intro: string;
   tags: string;
@@ -14,8 +18,12 @@ interface MentorRecommendationDto {
 
 interface StudentRecommendationDto {
   id: number;
-  nickname: string;
-  age: number;
+  user: {
+    id: number;
+    email: string;
+    nickname: string;
+    age: number;
+  };
   grade: string;
   region: string;
   interests: string;
@@ -42,9 +50,9 @@ export function useMentorRecommendations(enabled: boolean) {
           if (res.success) {
             setData(
               res.data.map((m) => ({
-                id: m.id,
-                nickname: m.nickname,
-                name: m.nickname, // nickname을 name으로 매핑
+                id: m.user.id,
+                nickname: m.user.nickname,
+                name: m.user.nickname, // nickname을 name으로 매핑
                 jobTitle: m.jobTitle,
                 tags: m.tags,
               }))
@@ -89,13 +97,13 @@ export function useMenteeRecommendations(enabled: boolean) {
           if (res.success) {
             setData(
               res.data.map((s) => ({
-                id: s.id,
-                nickname: s.nickname,
-                name: s.nickname,
+                id: s.user.id,
+                nickname: s.user.nickname,
+                name: s.user.nickname,
                 grade: s.grade,
                 region: s.region,
                 interests: s.interests,
-                age: s.age,
+                age: s.user.age,
               }))
             );
           } else {

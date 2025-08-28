@@ -34,7 +34,7 @@ export function useMentorsExplore(enabled: boolean) {
         const response = await get<APIMentorResponse[]>("/mentors");
         if (response.success) {
           const transformedData: MentorInfo[] = response.data.map((mentor) => ({
-            id: mentor.id,
+            id: mentor.user.id,
             nickname: mentor.user.nickname,
             jobTitle: mentor.jobTitle,
             tags: mentor.tags,
@@ -60,8 +60,12 @@ export function useMentorsExplore(enabled: boolean) {
 
 interface APIStudentResponse {
   id: number;
-  nickname: string;
-  age: number;
+  user: {
+    id: number;
+    email: string;
+    nickname: string;
+    age: number;
+  };
   grade: string;
   region: string;
   interests: string;
@@ -83,13 +87,13 @@ export function useStudentsExplore(enabled: boolean) {
         if (response.success) {
           const transformedData: MenteeInfo[] = response.data.map(
             (student) => ({
-              id: student.id,
-              nickname: student.nickname,
-              age: student.age,
+              id: student.user.id,
+              nickname: student.user.nickname,
+              age: student.user.age,
               grade: student.grade,
               region: student.region,
               interests: student.interests,
-              name: student.nickname, // nickname을 name으로 매핑
+              name: student.user.nickname, // nickname을 name으로 매핑
             })
           );
           setData(transformedData);

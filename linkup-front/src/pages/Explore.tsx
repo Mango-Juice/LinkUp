@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { IoSearch } from "react-icons/io5";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import useAuthStore from "../store/useAuthStore";
 import { useMentorsExplore, useStudentsExplore } from "../hooks/useExplore";
 import MentorCard from "../components/home/MentorCard";
@@ -13,6 +13,7 @@ import type { MenteeInfo } from "../types/MenteeInfo";
 const Explore = () => {
   const user = useAuthStore((s) => s.user);
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const isMentor = user?.role === "mentor";
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedProfile, setSelectedProfile] = useState<
@@ -25,6 +26,13 @@ const Explore = () => {
       navigate("/", { state: { openLogin: true } });
     }
   }, [user, navigate]);
+
+  useEffect(() => {
+    const query = searchParams.get("q");
+    if (query) {
+      setSearchQuery(query);
+    }
+  }, [searchParams]);
 
   const {
     data: mentors,

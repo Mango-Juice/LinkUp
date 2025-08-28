@@ -70,7 +70,7 @@ const Home = () => {
   return (
     <>
       <div className="flex flex-col lg:flex-row m-6 gap-10">
-        <AvatarSection user={user} />
+        <AvatarSection user={user} onAuthRequired={handleAuthRequired} />
         {isMentor ? (
           <MentorView
             onAuthRequired={handleAuthRequired}
@@ -99,7 +99,13 @@ const Home = () => {
   );
 };
 
-const AvatarSection = ({ user }: { user: UserInfo | null }) => {
+const AvatarSection = ({
+  user,
+  onAuthRequired,
+}: {
+  user: UserInfo | null;
+  onAuthRequired: (callback?: () => void) => void;
+}) => {
   const avatarConfig: AvatarFullConfig = genConfig(user?.name || "Guest");
 
   return (
@@ -114,28 +120,51 @@ const AvatarSection = ({ user }: { user: UserInfo | null }) => {
             ? `${user.name}님, 안녕하세요!`
             : "현직자 커피챗, 빠르고 쉽게!"}
         </div>
-        <SearchStubInput />
+        <SearchStubInput user={user} onAuthRequired={onAuthRequired} />
       </div>
       <PendingBookingsAlert user={user} />
     </div>
   );
 };
 
-const SearchStubInput = () => (
-  <div className="w-full mt-3">
-    <div className="relative">
-      <input
-        type="text"
-        placeholder="멘토 / 멘티 검색"
-        className="w-full rounded-lg border border-gray-300 dark:border-neutral-600 bg-white/70 dark:bg-neutral-800/70 px-3 py-2 pr-10 text-xs text-neutral-900 dark:text-neutral-100 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary/60 placeholder:text-gray-400 dark:placeholder:text-neutral-500 transition"
-        disabled
-      />
-      <span className="absolute inset-y-0 right-2 flex items-center text-gray-400 dark:text-neutral-500 text-xs select-none">
-        <IoSearch />
-      </span>
+const SearchStubInput = ({
+  onAuthRequired,
+}: {
+  user: UserInfo | null;
+  onAuthRequired: (callback?: () => void) => void;
+}) => {
+  const [searchQuery, setSearchQuery] = useState("");
+  const navigate = useNavigate();
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!searchQuery.trim()) return;
+
+    onAuthRequired(() => {
+      navigate(`/explore?q=${encodeURIComponent(searchQuery.trim())}`);
+    });
+  };
+
+  return (
+    <div className="w-full mt-3">
+      <form onSubmit={handleSearch} className="relative">
+        <input
+          type="text"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          placeholder="멘토 / 멘티 검색"
+          className="w-full rounded-lg border border-gray-300 dark:border-neutral-600 bg-white/70 dark:bg-neutral-800/70 px-3 py-2 pr-10 text-xs text-neutral-900 dark:text-neutral-100 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary/60 placeholder:text-gray-400 dark:placeholder:text-neutral-500 transition"
+        />
+        <button
+          type="submit"
+          className="absolute inset-y-0 right-2 flex items-center text-gray-400 dark:text-neutral-500 text-xs hover:text-primary-500 dark:hover:text-primary-400 transition-colors border-0 bg-transparent"
+        >
+          <IoSearch />
+        </button>
+      </form>
     </div>
-  </div>
-);
+  );
+};
 
 const PendingBookingsAlert = ({ user }: { user: UserInfo | null }) => {
   const [pendingBookings, setPendingBookings] = useState<PendingBooking[]>([]);
@@ -151,7 +180,7 @@ const PendingBookingsAlert = ({ user }: { user: UserInfo | null }) => {
           const pending = res.data.filter(
             (booking) =>
               booking.status === "PENDING" &&
-              booking.proposer.id !== getCurrentUserId(user)
+              booking.proposer.id !== user.id
           );
           setPendingBookings(pending);
         }
@@ -163,14 +192,6 @@ const PendingBookingsAlert = ({ user }: { user: UserInfo | null }) => {
     fetchPendingBookings();
   }, [user]);
 
-  const getCurrentUserId = (user: UserInfo) => {
-    try {
-      const payload = JSON.parse(window.atob(user.token.split(".")[1]));
-      return payload.id || 0;
-    } catch {
-      return 0;
-    }
-  };
 
   if (!user || pendingBookings.length === 0) return null;
 

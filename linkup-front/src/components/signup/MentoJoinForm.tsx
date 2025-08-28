@@ -32,6 +32,7 @@ interface MentorSignupPayload {
 }
 
 interface SignupResponse {
+  id: number;
   accessToken: string;
   age: number;
   message: string;
@@ -62,6 +63,7 @@ const MentoJoinForm = ({ onCancel, onSubmit }: Props) => {
         if (res.success) {
           const signupData = res.data;
           const user: UserInfo = {
+            id: signupData.id,
             token: signupData.accessToken,
             name: signupData.nickname,
             role: signupData.role === "MENTOR" ? "mentor" : "mentee",

@@ -15,6 +15,7 @@ interface LoginModalProps {
 }
 
 interface LoginResponse {
+  id: number;
   accessToken: string;
   nickname: string;
   role: "STUDENT" | "MENTOR";
@@ -39,6 +40,7 @@ const LoginModal = ({ isOpen, onClose }: LoginModalProps) => {
       if (res.success) {
         const data = res.data;
         const mapped: UserInfo = {
+          id: data.id,
           token: data.accessToken,
           name: data.nickname,
           role: data.role === "MENTOR" ? "mentor" : "mentee",
