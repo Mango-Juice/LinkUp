@@ -7,6 +7,7 @@ import PrimaryButton from "../PrimaryButton";
 import type { MentorInfo } from "../../types/MentorInfo";
 import type { MenteeInfo } from "../../types/MenteeInfo";
 import { toast } from "react-toastify";
+import { post } from "../../lib/api";
 
 interface ProfileDetailModalProps {
   isOpen: boolean;
@@ -35,10 +36,30 @@ const ProfileDetailModal = ({
   const avatarConfig: AvatarFullConfig = genConfig(profile.name);
   const isMentorProfile = isMentor(profile);
 
-  const handleBookingSubmit = (e: React.FormEvent) => {
+  const handleBookingSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    toast.success("커피챗 요청이 완료되었습니다!");
-    handleClose();
+    
+    try {
+      const preferredTimeText = `${selectedDate} ${selectedTime}`;
+      
+      const requestBody = {
+        toMentorUserId: profileType === "mentor" ? profile.id : null,
+        toStudentUserId: profileType === "mentee" ? profile.id : null,
+        message,
+        preferredTimeText
+      };
+
+      const res = await post("/bookings/proposal", requestBody);
+
+      if (res.success) {
+        toast.success("커피챗 요청이 완료되었습니다!");
+        handleClose();
+      } else {
+        toast.error(res.error || "커피챗 요청에 실패했습니다.");
+      }
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "커피챗 요청에 실패했습니다.");
+    }
   };
 
   const handleClose = () => {

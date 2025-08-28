@@ -10,6 +10,7 @@ import SignUp from "./pages/SignUp";
 import Header from "./components/Header";
 import { AnimatePresence, motion } from "framer-motion";
 import Explore from "./pages/Explore";
+import Reservation from "./pages/Reservation";
 
 const pageVariants = {
   initial: { opacity: 0, y: 16 },
@@ -56,6 +57,14 @@ const AnimatedRoutes = () => {
           element={
             <PageWrapper>
               <Explore />
+            </PageWrapper>
+          }
+        />
+        <Route
+          path="/reservation"
+          element={
+            <PageWrapper>
+              <Reservation />
             </PageWrapper>
           }
         />

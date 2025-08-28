@@ -41,7 +41,7 @@ const Header = () => {
           onClick={() => navigate("/")}
         />
         <HeaderMenu onClick={() => navigate("/")}>예약 현황</HeaderMenu>
-        <HeaderMenu onClick={() => navigate("/")}>신청 내역</HeaderMenu>
+        <HeaderMenu onClick={() => navigate("/")}>커피챗 내역</HeaderMenu>
         <HeaderMenu onClick={() => navigate("/")}>개인 정보</HeaderMenu>
         <HeaderMenu onClick={() => navigate("/")}>챗봇 💬</HeaderMenu>
         <div className="flex-1" />
