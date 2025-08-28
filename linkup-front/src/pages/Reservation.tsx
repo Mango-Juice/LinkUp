@@ -19,6 +19,7 @@ interface BookingUser {
 
 interface Booking {
   id: number;
+  time: string;
   status: "PENDING" | "APPROVED" | "REJECTED" | "CANCELLED";
   student: BookingUser;
   mentor: BookingUser;
@@ -133,14 +134,11 @@ const Reservation = () => {
   const currentUserId = user.id;
   const isProposer = (booking: Booking) => booking.proposer.id === user.id;
 
-  // 로컬에서 필터링된 예약 목록
   const filteredBookings = allBookings.filter((booking) => {
-    // 상태 필터
     if (filterStatus !== "all" && booking.status !== filterStatus) {
       return false;
     }
 
-    // 역할 필터
     if (filterRole !== "all") {
       if (filterRole === "proposer" && !isProposer(booking)) {
         return false;
@@ -340,7 +338,7 @@ const BookingCard = ({
           <div className="flex items-center gap-4 mb-3 text-sm text-neutral-600 dark:text-neutral-400">
             <div className="flex items-center gap-1">
               <IoTime className="w-4 h-4" />
-              <span>{new Date(booking.createdAt).toLocaleDateString()}</span>
+              <span>{booking.time}</span>
             </div>
           </div>
 
