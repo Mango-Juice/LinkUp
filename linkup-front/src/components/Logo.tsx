@@ -10,8 +10,10 @@ const Logo = ({ className, onClick }: LogoProps) => {
 
   return (
     <div className={classes} onClick={onClick}>
-      <div className="text-4xl font-extrabold text-primary-500">LINK UP</div>
-      <div className="text-xs font-medium text-gray-500 my-0">
+      <div className="text-4xl font-extrabold text-primary-500 font-title">
+        LINK UP
+      </div>
+      <div className="my-0 text-xs font-medium tracking-wider text-gray-500">
         현직자와 만나는 커피챗 타임
       </div>
     </div>

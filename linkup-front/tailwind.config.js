@@ -68,7 +68,7 @@ export default {
         medium: "#D4D4D4",
       },
       backgroundImage: {
-        'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
+        "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
       },
       borderRadius: {
         "2xl": "16px",
@@ -79,6 +79,7 @@ export default {
       },
       fontFamily: {
         spoqa: ["Spoqa Han Sans Neo", "sans-serif"],
+        title: ["PyeongchangPeace", "Spoqa Han Sans Neo", "sans-serif"],
       },
       fontWeight: {
         thin: "100",
