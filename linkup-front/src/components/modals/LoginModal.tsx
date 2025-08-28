@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import Logo from "../Logo";
@@ -27,6 +27,15 @@ const LoginModal = ({ isOpen, onClose }: LoginModalProps) => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const authorize = useAuthStore((s) => s.authorize);
+
+  // 모달이 열릴 때마다 입력 필드 초기화
+  useEffect(() => {
+    if (isOpen) {
+      setId("");
+      setPw("");
+      setLoading(false);
+    }
+  }, [isOpen]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
