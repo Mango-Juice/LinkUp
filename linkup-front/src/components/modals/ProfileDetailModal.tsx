@@ -64,7 +64,7 @@ const ProfileDetailModal = ({
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.2, delay: 0.05 }}
         >
-          <h2 className="text-xl font-semibold text-neutral-900">
+          <h2 className="text-xl font-semibold text-neutral-900 dark:text-neutral-100">
             {profileType === "mentor" ? "멘토 프로필" : "멘티 프로필"}
           </h2>
           <motion.button
@@ -73,7 +73,7 @@ const ProfileDetailModal = ({
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
           >
-            <IoClose className="w-5 h-5 text-neutral-500 hover:text-neutral-700" />
+            <IoClose className="w-5 h-5 text-neutral-500 dark:text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200" />
           </motion.button>
         </motion.div>
 
@@ -84,16 +84,16 @@ const ProfileDetailModal = ({
           transition={{ duration: 0.2, delay: 0.1 }}
         >
           <Avatar
-            className="w-32 h-32 rounded-full ring-4 ring-primary-100 shadow-lg mb-4"
+            className="w-32 h-32 rounded-full ring-4 ring-primary-100 dark:ring-primary-900/30 shadow-lg mb-4"
             {...avatarConfig}
           />
-          <h3 className="text-2xl font-bold text-neutral-900 mb-2">
+          <h3 className="text-2xl font-bold text-neutral-900 dark:text-neutral-100 mb-2">
             {profile.name}
           </h3>
 
           {isMentorProfile ? (
             <>
-              <p className="text-sm text-neutral-600 mb-3">
+              <p className="text-sm text-neutral-600 dark:text-neutral-400 mb-3">
                 {profile.jobTitle}
               </p>
               <motion.div
@@ -112,7 +112,7 @@ const ProfileDetailModal = ({
                   .map((tag, index) => (
                     <motion.span
                       key={tag}
-                      className="px-3 py-1 rounded-full bg-primary-100 text-primary-600 text-xs font-medium"
+                      className="px-3 py-1 rounded-full bg-primary-100 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400 text-xs font-medium"
                       initial={{ opacity: 0, scale: 0.8 }}
                       animate={{ opacity: 1, scale: 1 }}
                       transition={{ duration: 0.15, delay: 0.15 + index * 0.03 }}
@@ -143,7 +143,7 @@ const ProfileDetailModal = ({
                   .map((interest, index) => (
                     <motion.span
                       key={interest}
-                      className="px-3 py-1 rounded-full bg-primary-100 text-primary-600 text-xs font-medium"
+                      className="px-3 py-1 rounded-full bg-primary-100 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400 text-xs font-medium"
                       initial={{ opacity: 0, scale: 0.8 }}
                       animate={{ opacity: 1, scale: 1 }}
                       transition={{ duration: 0.15, delay: 0.15 + index * 0.03 }}

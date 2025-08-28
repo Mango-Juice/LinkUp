@@ -8,15 +8,15 @@ const MarqueeGhostCard = ({ mentor }: { mentor: MentorInfo }) => {
   const avatarConfig: AvatarFullConfig = genConfig(mentor.name);
 
   return (
-    <div className="flex flex-col items-center shrink-0 gap-2 opacity-70 border shadow-md w-48 p-5 rounded-2xl bg-white/70 backdrop-blur border-gray-200 select-none">
+    <div className="flex flex-col items-center shrink-0 gap-2 opacity-70 border shadow-md w-48 p-5 rounded-2xl bg-white/70 dark:bg-neutral-800/70 backdrop-blur border-gray-200 dark:border-neutral-700 select-none">
       <Avatar
-        className="w-14 h-14 rounded-full ring-2 ring-white shadow"
+        className="w-14 h-14 rounded-full ring-2 ring-white dark:ring-neutral-700 shadow"
         {...avatarConfig}
       />
-      <div className="text-xs font-semibold text-gray-700 line-clamp-1">
+      <div className="text-xs font-semibold text-gray-700 dark:text-neutral-300 line-clamp-1">
         {mentor.name}
       </div>
-      <div className="text-[10px] text-gray-500 line-clamp-1">
+      <div className="text-[10px] text-gray-500 dark:text-neutral-500 line-clamp-1">
         {mentor.jobTitle}
       </div>
     </div>
@@ -32,7 +32,7 @@ export default function ShowcaseMarquee({ onExploreClick }: ShowcaseMarqueeProps
 
   return (
     <div
-      className="relative overflow-hidden rounded-xl bg-white"
+      className="relative overflow-hidden rounded-xl bg-white dark:bg-neutral-800"
       style={{ width: "calc(100vw - 320px)" }}
     >
       <motion.div

@@ -67,6 +67,9 @@ export default {
         light: "#F5F5F5",
         medium: "#D4D4D4",
       },
+      backgroundImage: {
+        'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
+      },
       borderRadius: {
         "2xl": "16px",
         xl: "12px",

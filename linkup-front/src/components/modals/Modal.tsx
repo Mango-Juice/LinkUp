@@ -46,7 +46,7 @@ const Modal = ({
           />
           <motion.div
             onClick={(e) => e.stopPropagation()}
-            className="bg-white p-8 rounded-xl shadow-md relative z-10"
+            className="bg-white dark:bg-neutral-900 p-8 rounded-xl shadow-md relative z-10"
             initial={{ opacity: 0, scale: 0.9, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9, y: 20 }}
@@ -60,7 +60,7 @@ const Modal = ({
             {hasExitButton && (
               <IoClose
                 onClick={onClose}
-                className="cursor-pointer absolute top-2 right-2 text-xl hover:opacity-70 transition-opacity"
+                className="cursor-pointer absolute top-2 right-2 text-xl text-neutral-600 dark:text-neutral-400 hover:opacity-70 transition-opacity"
                 aria-label="닫기"
               />
             )}

@@ -82,9 +82,9 @@ const AvatarSection = ({ user }: { user: UserInfo | null }) => {
 
   return (
     <div className="lg:sticky lg:top-24 lg:self-start">
-      <div className="bg-primary-100 rounded-xl p-4 md:p-6 shadow-lg flex flex-col items-center gap-2 w-full lg:w-[250px] max-w-sm mx-auto lg:mx-0">
+      <div className="bg-primary-100 dark:bg-primary-900/20 rounded-xl p-4 md:p-6 shadow-lg flex flex-col items-center gap-2 w-full lg:w-[250px] max-w-sm mx-auto lg:mx-0">
         <Avatar className="w-20 sm:w-24 lg:w-28 h-20 sm:h-24 lg:h-28" {...avatarConfig} />
-        <div className="text-center mt-2 font-semibold text-sm">
+        <div className="text-center mt-2 font-semibold text-sm text-neutral-800 dark:text-neutral-200">
           {user?.name
             ? `${user.name}님, 안녕하세요!`
             : "현직자 커피챗, 빠르고 쉽게!"}
@@ -101,10 +101,10 @@ const SearchStub = () => (
       <input
         type="text"
         placeholder="멘토 / 멘티 검색"
-        className="w-full rounded-lg border border-gray-300 bg-white/70 px-3 py-2 pr-10 text-xs focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary/60 placeholder:text-gray-400 transition"
+        className="w-full rounded-lg border border-gray-300 dark:border-neutral-600 bg-white/70 dark:bg-neutral-800/70 px-3 py-2 pr-10 text-xs text-neutral-900 dark:text-neutral-100 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary/60 placeholder:text-gray-400 dark:placeholder:text-neutral-500 transition"
         disabled
       />
-      <span className="absolute inset-y-0 right-2 flex items-center text-gray-400 text-xs select-none">
+      <span className="absolute inset-y-0 right-2 flex items-center text-gray-400 dark:text-neutral-500 text-xs select-none">
         <IoSearch />
       </span>
     </div>
@@ -178,17 +178,17 @@ const MentorView = ({ onAuthRequired, onProfileClick, onExploreClick }: ViewProp
 };
 
 const SectionTitle = ({ children }: { children: React.ReactNode }) => (
-  <div className="text-xl font-semibold mb-4">{children}</div>
+  <div className="text-xl font-semibold mb-4 text-neutral-900 dark:text-neutral-100">{children}</div>
 );
 
 const MenteeMoreHeadline = () => (
-  <h2 className="text-xl font-semibold mt-12 mb-4">
+  <h2 className="text-xl font-semibold mt-12 mb-4 text-neutral-900 dark:text-neutral-100">
     더 많은 현직자 멘토분들을 만나볼까요?
   </h2>
 );
 
 const MentorMoreHeadline = () => (
-  <h2 className="text-xl font-semibold mt-12 mb-4">
+  <h2 className="text-xl font-semibold mt-12 mb-4 text-neutral-900 dark:text-neutral-100">
     더 많은 학생 멘티들을 만나볼까요?
   </h2>
 );
