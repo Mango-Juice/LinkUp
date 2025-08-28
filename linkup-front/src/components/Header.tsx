@@ -27,7 +27,8 @@ const Header = () => {
   const handleAuthClick = () => {
     if (user) {
       deauthorize();
-      toast.success("로그아웃 되었습니다.");
+      toast.warn("로그아웃 되었습니다.");
+      navigate("/");
     } else {
       setIsOpen(true);
     }
@@ -40,10 +41,18 @@ const Header = () => {
           className="cursor-pointer pl-6 pr-6"
           onClick={() => navigate("/")}
         />
-        <HeaderMenu onClick={() => navigate("/reservation")}>예약 현황</HeaderMenu>
-        <HeaderMenu onClick={() => navigate("/")}>커피챗 내역</HeaderMenu>
-        <HeaderMenu onClick={() => navigate("/")}>개인 정보</HeaderMenu>
-        <HeaderMenu onClick={() => navigate("/")}>챗봇 💬</HeaderMenu>
+        <HeaderMenu onClick={() => navigate("/reservation")}>
+          예약 현황
+        </HeaderMenu>
+        <HeaderMenu onClick={() => toast.info("커피챗 내역은 준비 중입니다.")}>
+          커피챗 내역
+        </HeaderMenu>
+        <HeaderMenu onClick={() => toast.info("개인 정보는 준비 중입니다.")}>
+          개인 정보
+        </HeaderMenu>
+        <HeaderMenu onClick={() => toast.info("챗봇은 준비 중입니다.")}>
+          챗봇 💬
+        </HeaderMenu>
         <div className="flex-1" />
         <HeaderMenu onClick={handleAuthClick}>
           {user ? "로그아웃" : "로그인/회원가입"}

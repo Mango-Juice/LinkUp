@@ -45,7 +45,6 @@ const ProfileDetailModal = ({
       const profileId = isMentorProfile
         ? (profile as MentorInfo).id
         : (profile as MenteeInfo).id;
-      console.log(profile);
 
       const requestBody = {
         ...(profileType === "mentor" && { mentorUserId: profileId }),

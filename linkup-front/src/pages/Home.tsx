@@ -1,6 +1,6 @@
 import Avatar, { genConfig, type AvatarFullConfig } from "react-nice-avatar";
-import { IoSearch } from "react-icons/io5";
-import { useMemo, useState } from "react";
+import { IoSearch, IoCafe, IoTime } from "react-icons/io5";
+import { useMemo, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import useAuthStore from "../store/useAuthStore";
 import {
@@ -14,9 +14,26 @@ import ShowcaseMarquee from "../components/home/ShowcaseMarquee";
 import LoginModal from "../components/modals/LoginModal";
 import ProfileDetailModal from "../components/modals/ProfileDetailModal";
 import { LoadingText, ErrorText } from "../components/common/LoadingError";
+import { get, type ApiResponse } from "../lib/api";
 import type { UserInfo } from "../types/UserInfo";
 import type { MentorInfo } from "../types/MentorInfo";
 import type { MenteeInfo } from "../types/MenteeInfo";
+
+interface BookingUser {
+  id: number;
+  nickname: string;
+  jobTitle?: string;
+}
+
+interface PendingBooking {
+  id: number;
+  status: "PENDING";
+  student: BookingUser;
+  mentor: BookingUser;
+  proposer: BookingUser;
+  note: string;
+  createdAt: string;
+}
 
 const Home = () => {
   const user = useAuthStore((s) => s.user);
@@ -97,13 +114,14 @@ const AvatarSection = ({ user }: { user: UserInfo | null }) => {
             ? `${user.name}님, 안녕하세요!`
             : "현직자 커피챗, 빠르고 쉽게!"}
         </div>
-        <SearchStub />
+        <SearchStubInput />
       </div>
+      <PendingBookingsAlert user={user} />
     </div>
   );
 };
 
-const SearchStub = () => (
+const SearchStubInput = () => (
   <div className="w-full mt-3">
     <div className="relative">
       <input
@@ -118,6 +136,84 @@ const SearchStub = () => (
     </div>
   </div>
 );
+
+const PendingBookingsAlert = ({ user }: { user: UserInfo | null }) => {
+  const [pendingBookings, setPendingBookings] = useState<PendingBooking[]>([]);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!user) return;
+
+    const fetchPendingBookings = async () => {
+      try {
+        const res: ApiResponse<PendingBooking[]> = await get("/bookings/me");
+        if (res.success) {
+          const pending = res.data.filter(
+            (booking) =>
+              booking.status === "PENDING" &&
+              booking.proposer.id !== getCurrentUserId(user)
+          );
+          setPendingBookings(pending);
+        }
+      } catch {
+        // 오류 무시 - 핵심 기능이 아니므로
+      }
+    };
+
+    fetchPendingBookings();
+  }, [user]);
+
+  const getCurrentUserId = (user: UserInfo) => {
+    try {
+      const payload = JSON.parse(window.atob(user.token.split(".")[1]));
+      return payload.id || 0;
+    } catch {
+      return 0;
+    }
+  };
+
+  if (!user || pendingBookings.length === 0) return null;
+
+  return (
+    <div className="mt-4 w-full lg:w-[250px] max-w-sm mx-auto lg:mx-0">
+      <div className="p-3 bg-primary-50 dark:bg-yellow-900/20 border-0 rounded-lg shadow-lg">
+        <div className="flex items-center gap-2 mb-2">
+          <IoCafe className="w-4 h-4 text-primary-600 dark:text-primary-400" />
+          <span className="text-xs font-medium text-primary-800 dark:text-primary-300">
+            대기 중인 예약 신청 {pendingBookings.length}건
+          </span>
+        </div>
+        <div className="space-y-1">
+          {pendingBookings.slice(0, 2).map((booking) => {
+            const otherUser =
+              user?.role === "mentor" ? booking.student : booking.mentor;
+            return (
+              <div
+                key={booking.id}
+                className="flex items-center gap-2 text-xs text-primary-700 dark:text-primary-300"
+              >
+                <IoTime className="w-3 h-3" />
+                <span>{otherUser.nickname}</span>
+                {otherUser.jobTitle && <span>• {otherUser.jobTitle}</span>}
+              </div>
+            );
+          })}
+          {pendingBookings.length > 2 && (
+            <div className="text-xs text-primary-600 dark:text-primary-400">
+              외 {pendingBookings.length - 2}건
+            </div>
+          )}
+        </div>
+        <button
+          onClick={() => navigate("/reservation")}
+          className="mt-2 w-full text-xs border-0 bg-primary-100 dark:bg-primary-900/50 text-primary-800 dark:text-primary-300 py-1 rounded hover:bg-primary-200 dark:hover:bg-primary-900/70 transition-colors"
+        >
+          예약 관리하기
+        </button>
+      </div>
+    </div>
+  );
+};
 
 interface ViewProps {
   onAuthRequired: (callback?: () => void) => void;

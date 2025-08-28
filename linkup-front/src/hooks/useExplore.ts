@@ -5,9 +5,18 @@ import type { MenteeInfo } from "../types/MenteeInfo";
 
 interface APIMentorResponse {
   id: number;
-  nickname: string;
+  user: {
+    id: number;
+    email: string;
+    nickname: string;
+  };
   jobTitle: string;
+  major: string;
+  orgName: string;
+  status: string;
   tags: string;
+  intro: string;
+  verificationUrl: string | null;
 }
 
 export function useMentorsExplore(enabled: boolean) {
@@ -26,10 +35,10 @@ export function useMentorsExplore(enabled: boolean) {
         if (response.success) {
           const transformedData: MentorInfo[] = response.data.map((mentor) => ({
             id: mentor.id,
-            nickname: mentor.nickname,
+            nickname: mentor.user.nickname,
             jobTitle: mentor.jobTitle,
             tags: mentor.tags,
-            name: mentor.nickname, // nickname을 name으로 매핑
+            name: mentor.user.nickname, // nickname을 name으로 매핑
           }));
           setData(transformedData);
         } else {

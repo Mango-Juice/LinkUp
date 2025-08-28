@@ -19,17 +19,25 @@ interface MenteeSignupPayload {
   email: string;
   password: string;
   nickname: string;
-  age: number | null;
+  age: number;
   role: "STUDENT";
+  student: {
+    grade: string;
+    region: string;
+    interests: string;
+  };
 }
 
-interface LoginResponse {
+interface SignupResponse {
   accessToken: string;
+  age: number;
+  message: string;
   nickname: string;
+  email: string;
   role: "STUDENT" | "MENTOR";
 }
 
-type SignupRes = LoginResponse;
+type SignupRes = SignupResponse;
 
 const MenteeJoinForm = ({ onCancel, onSubmit }: Props) => {
   const [userId, setUserId] = useState("");
@@ -47,22 +55,13 @@ const MenteeJoinForm = ({ onCancel, onSubmit }: Props) => {
     onSuccess: async (res) => {
       try {
         if (res.success) {
-          const loginData = res.data;
+          const signupData = res.data;
           const user: UserInfo = {
-            token: loginData.accessToken,
-            name: loginData.nickname,
-            role: loginData.role === "MENTOR" ? "mentor" : "mentee",
+            token: signupData.accessToken,
+            name: signupData.nickname,
+            role: signupData.role === "MENTOR" ? "mentor" : "mentee",
           };
           authorize(user);
-          try {
-            await post<unknown>("/students/me", {
-              grade: "고2",
-              region: "서울",
-              interests: topic ? `${topic}` : "없음",
-            });
-          } catch (e) {
-            console.error("[STUDENT EXTRA FAIL]", e);
-          }
           toast.success("멘티 가입 및 로그인 완료!");
           onSubmit();
         } else {
@@ -89,7 +88,12 @@ const MenteeJoinForm = ({ onCancel, onSubmit }: Props) => {
       email: userId,
       password,
       nickname: name,
-      age: age ? Number(age) : null,
+      age: Number(age),
+      student: {
+        grade: "고2",
+        region: "서울",
+        interests: major || "기타",
+      },
     };
     signupMutation.mutate(payload);
   };

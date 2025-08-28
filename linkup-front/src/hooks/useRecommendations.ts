@@ -13,7 +13,7 @@ interface MentorRecommendationDto {
 }
 
 interface StudentRecommendationDto {
-  studentId: number;
+  id: number;
   nickname: string;
   age: number;
   grade: string;
@@ -89,7 +89,7 @@ export function useMenteeRecommendations(enabled: boolean) {
           if (res.success) {
             setData(
               res.data.map((s) => ({
-                id: s.studentId,
+                id: s.id,
                 nickname: s.nickname,
                 name: s.nickname,
                 grade: s.grade,

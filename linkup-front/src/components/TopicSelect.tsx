@@ -6,10 +6,10 @@ interface TopicOption {
 }
 
 const DEFAULT_OPTIONS: TopicOption[] = [
-  { value: "admission", label: "입시" },
-  { value: "change_major", label: "전과" },
-  { value: "overseas", label: "해외진학" },
-  { value: "job", label: "직무" },
+  { value: "입시", label: "입시" },
+  { value: "전과", label: "전과" },
+  { value: "해외진학", label: "해외진학" },
+  { value: "직무", label: "직무" },
 ];
 
 interface TopicSelectProps {

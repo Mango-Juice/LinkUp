@@ -19,17 +19,28 @@ interface MentorSignupPayload {
   email: string;
   password: string;
   nickname: string;
-  age: number | null;
+  age: number;
   role: "MENTOR";
+  mentor: {
+    jobTitle: string;
+    major: string;
+    intro: string;
+    tags: string;
+    orgName: string;
+    verificationUrl: string;
+  };
 }
 
-interface LoginResponse {
+interface SignupResponse {
   accessToken: string;
+  age: number;
+  message: string;
   nickname: string;
+  email: string;
   role: "STUDENT" | "MENTOR";
 }
 
-type SignupRes = LoginResponse; // 가입 시 동일 응답 (자동 로그인)
+type SignupRes = SignupResponse;
 
 const MentoJoinForm = ({ onCancel, onSubmit }: Props) => {
   const [userId, setUserId] = useState("");
@@ -49,25 +60,13 @@ const MentoJoinForm = ({ onCancel, onSubmit }: Props) => {
     onSuccess: async (res) => {
       try {
         if (res.success) {
-          const loginData = res.data;
+          const signupData = res.data;
           const user: UserInfo = {
-            token: loginData.accessToken,
-            name: loginData.nickname,
-            role: loginData.role === "MENTOR" ? "mentor" : "mentee",
+            token: signupData.accessToken,
+            name: signupData.nickname,
+            role: signupData.role === "MENTOR" ? "mentor" : "mentee",
           };
           authorize(user);
-          try {
-            await post<unknown>("/mentors/me", {
-              jobTitle: job,
-              major: major || "없음",
-              intro: "나에 대한 설명",
-              tags: topic ? `${topic}` : "없음",
-              orgName: education,
-              verificationUrl: "https://example.com/studentcard.png",
-            });
-          } catch (e) {
-            console.error("[MENTOR EXTRA FAIL]", e);
-          }
           toast.success("멘토 가입 및 로그인 완료!");
           onSubmit();
         } else {
@@ -94,7 +93,15 @@ const MentoJoinForm = ({ onCancel, onSubmit }: Props) => {
       email: userId,
       password,
       nickname: name,
-      age: age ? Number(age) : null,
+      age: Number(age),
+      mentor: {
+        jobTitle: job,
+        major: major || "기타",
+        intro: "나에 대한 설명",
+        tags: major || "기타",
+        orgName: education,
+        verificationUrl: "https://example.com/studentcard.png",
+      },
     };
     signupMutation.mutate(payload);
   };

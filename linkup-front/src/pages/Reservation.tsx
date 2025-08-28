@@ -31,7 +31,7 @@ interface Booking {
 const Reservation = () => {
   const user = useAuthStore((s) => s.user);
   const navigate = useNavigate();
-  const [bookings, setBookings] = useState<Booking[]>([]);
+  const [allBookings, setAllBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [filterStatus, setFilterStatus] = useState<string>("all");
@@ -51,20 +51,10 @@ const Reservation = () => {
       setError(null);
 
       try {
-        const params = new URLSearchParams();
-        if (filterStatus !== "all") {
-          params.append("status", filterStatus);
-        }
-        if (filterRole !== "all") {
-          params.append("as", filterRole);
-        }
-
-        const res: ApiResponse<Booking[]> = await get<Booking[]>(
-          `/bookings/me${params.toString() ? `?${params.toString()}` : ""}`
-        );
+        const res: ApiResponse<Booking[]> = await get<Booking[]>("/bookings/me");
 
         if (res.success) {
-          setBookings(res.data);
+          setAllBookings(res.data);
         } else {
           setError(res.error || "예약 목록을 불러오는데 실패했습니다.");
         }
@@ -76,7 +66,7 @@ const Reservation = () => {
     };
 
     fetchBookings();
-  }, [user, filterStatus, filterRole]);
+  }, [user]);
 
   const handleApproveBooking = async (bookingId: number) => {
     try {
@@ -86,8 +76,8 @@ const Reservation = () => {
       if (res.success) {
         toast.success("예약을 수락했습니다!");
         // 목록 새로고침
-        setBookings(
-          bookings.map((b) =>
+        setAllBookings(
+          allBookings.map((b) =>
             b.id === bookingId ? { ...b, status: "APPROVED" as const } : b
           )
         );
@@ -112,8 +102,8 @@ const Reservation = () => {
       });
       if (res.success) {
         toast.success("예약을 거절했습니다.");
-        setBookings(
-          bookings.map((b) =>
+        setAllBookings(
+          allBookings.map((b) =>
             b.id === bookingId
               ? {
                   ...b,
@@ -138,8 +128,8 @@ const Reservation = () => {
       const res = await post(`/bookings/${bookingId}/cancel`, {});
       if (res.success) {
         toast.success("예약을 취소했습니다.");
-        setBookings(
-          bookings.map((b) =>
+        setAllBookings(
+          allBookings.map((b) =>
             b.id === bookingId ? { ...b, status: "CANCELLED" as const } : b
           )
         );
@@ -170,6 +160,26 @@ const Reservation = () => {
   const isProposer = (booking: Booking) =>
     booking.proposer.id === currentUserId;
 
+  // 로컬에서 필터링된 예약 목록
+  const filteredBookings = allBookings.filter((booking) => {
+    // 상태 필터
+    if (filterStatus !== "all" && booking.status !== filterStatus) {
+      return false;
+    }
+
+    // 역할 필터
+    if (filterRole !== "all") {
+      if (filterRole === "proposer" && !isProposer(booking)) {
+        return false;
+      }
+      if (filterRole === "participant" && isProposer(booking)) {
+        return false;
+      }
+    }
+
+    return true;
+  });
+
   return (
     <div className="m-6">
       <div className="mb-8">
@@ -191,7 +201,7 @@ const Reservation = () => {
       <div className="space-y-4">
         {loading && <LoadingText />}
         {!loading && error && <ErrorText message={error} />}
-        {!loading && !error && bookings.length === 0 && (
+        {!loading && !error && allBookings.length === 0 && (
           <div className="text-center py-12">
             <IoCafe className="w-16 h-16 text-gray-300 mx-auto mb-4" />
             <p className="text-gray-500 text-lg">예약이 없습니다</p>
@@ -200,9 +210,18 @@ const Reservation = () => {
             </p>
           </div>
         )}
+        {!loading && !error && filteredBookings.length === 0 && allBookings.length > 0 && (
+          <div className="text-center py-12">
+            <IoCafe className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+            <p className="text-gray-500 text-lg">해당 조건의 예약이 없습니다</p>
+            <p className="text-gray-400 text-sm mt-2">
+              다른 필터 조건을 선택해보세요
+            </p>
+          </div>
+        )}
         {!loading &&
           !error &&
-          bookings.map((booking) => (
+          filteredBookings.map((booking) => (
             <BookingCard
               key={booking.id}
               booking={booking}
@@ -244,12 +263,12 @@ const FilterTabs = ({
   ];
 
   return (
-    <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
+    <div className="flex flex-row gap-20 justify-center">
       <div>
-        <h3 className="text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-3">
+        <span className="text-sm font-medium text-neutral-700 dark:text-neutral-300 mr-4 underline">
           상태
-        </h3>
-        <div className="flex gap-2 flex-wrap">
+        </span>
+        <div className="inline-flex gap-2 flex-wrap">
           {statusTabs.map((tab) => (
             <button
               key={tab.key}
@@ -267,10 +286,10 @@ const FilterTabs = ({
       </div>
 
       <div>
-        <h3 className="text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-3">
+        <span className="text-sm font-medium text-neutral-700 dark:text-neutral-300 mr-4 underline">
           역할
-        </h3>
-        <div className="flex gap-2 flex-wrap">
+        </span>
+        <div className="inline-flex gap-2 flex-wrap">
           {roleTabs.map((tab) => (
             <button
               key={tab.key}
@@ -347,38 +366,40 @@ const BookingCard = ({
             </div>
           </div>
 
-          {booking.note && (
-            <div className="bg-neutral-50 dark:bg-neutral-700 rounded-lg p-3 mt-3">
-              <p className="text-sm text-neutral-700 dark:text-neutral-300">
-                "{booking.note}"
-              </p>
-            </div>
-          )}
+          <div className="flex flex-row gap-5">
+            {booking.note && (
+              <div className="flex-grow bg-neutral-50 dark:bg-neutral-700 rounded-lg p-3 mt-3">
+                <p className="text-sm text-neutral-700 dark:text-neutral-300">
+                  메모: "{booking.note}"
+                </p>
+              </div>
+            )}
 
-          {booking.rejectReason && booking.status === "REJECTED" && (
-            <div className="bg-red-50 dark:bg-red-900/20 rounded-lg p-3 mt-3">
-              <p className="text-sm text-red-700 dark:text-red-300">
-                거절 사유: "{booking.rejectReason}"
-              </p>
-            </div>
-          )}
+            {booking.rejectReason && booking.status === "REJECTED" && (
+              <div className="flex-grow bg-red-50 dark:bg-red-900/20 rounded-lg p-3 mt-3">
+                <p className="text-sm text-red-700 dark:text-red-300">
+                  거절 사유: "{booking.rejectReason}"
+                </p>
+              </div>
+            )}
+          </div>
 
           {/* Action buttons */}
           {booking.status === "PENDING" && (
-            <div className="mt-4 flex gap-2">
+            <div className="mt-4 flex gap-2 justify-end">
               {!isProposer ? (
                 // 상대방이 제안한 경우 - 수락/거절 버튼
                 <>
                   <button
                     onClick={() => onApprove(booking.id)}
-                    className="flex items-center gap-2 px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg text-sm font-medium transition-colors"
+                    className="flex items-center gap-2 px-4 py-2 bg-green-400 hover:bg-green-500 border-0 text-white rounded-lg text-sm font-medium transition-colors"
                   >
                     <IoCheckmark className="w-4 h-4" />
                     수락
                   </button>
                   <button
                     onClick={() => onReject(booking.id)}
-                    className="flex items-center gap-2 px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg text-sm font-medium transition-colors"
+                    className="flex items-center gap-2 px-4 py-2 bg-red-400 hover:bg-red-500 border-0 text-white rounded-lg text-sm font-medium transition-colors"
                   >
                     <IoClose className="w-4 h-4" />
                     거절
